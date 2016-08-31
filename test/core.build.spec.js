@@ -6,7 +6,7 @@ const mock = require('mock-require');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 
-describe('stache-core build', () => {
+describe('sky-pages build', () => {
 
   const port = 1337;
   beforeAll(() => {
@@ -19,9 +19,9 @@ describe('stache-core build', () => {
   });
 
   it('should handle fatal build error', () => {
-    const spyWebpack = function(config) {
+    const spyWebpack = function (config) {
       return {
-        run: function(cb) {
+        run: function (cb) {
           cb('ThrowError', {});
         }
       };
@@ -31,11 +31,11 @@ describe('stache-core build', () => {
   });
 
   it('should handle build error and warning', () => {
-    const spyWebpack = function(config) {
+    const spyWebpack = function (config) {
       return {
-        run: function(cb) {
+        run: function (cb) {
           cb(null, {
-            toJson: function() {
+            toJson: function () {
               return {
                 errors: [
                   'error'

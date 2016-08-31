@@ -1,10 +1,10 @@
 {
-  "name": "blackbaud-stache-core",
+  "name": "blackbaud-sky-pages",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "bin": {
-    "stache-core": "bin/stache-core.js"
+    "sky-pages": "bin/sky-pages.js"
   },
   "scripts": {
     "istanbul": "istanbul cover --report=html jasmine JASMINE_CONFIG_PATH=jasmine.json",
@@ -15,15 +15,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/blackbaud/stache-core.git"
+    "url": "git+https://github.com/blackbaud/sky-pages.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/blackbaud/stache-core/issues"
+    "url": "https://github.com/blackbaud/sky-pages/issues"
   },
-  "homepage": "https://github.com/blackbaud/stache-core#readme",
+  "homepage": "https://github.com/blackbaud/sky-pages#readme",
   "dependencies": {
     "open": "0.0.5",
     "progress-bar-webpack-plugin": "1.9.0",
