@@ -2,7 +2,7 @@
 
 const version = require('../lib/core/version');
 
-describe('stache-core', () => {
+describe('sky-pages', () => {
 
   it('should display the version', () => {
     expect(version()).toMatch(/^\w+\.\w+\.\w+/);

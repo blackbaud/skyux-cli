@@ -6,18 +6,18 @@ const path = require('path');
 const mock = require('mock-require');
 const build = require('../lib/webpack/build.config');
 
-describe('stache-core webpack build', () => {
+describe('sky-pages webpack build', () => {
   const nodeModules = path.join(process.cwd(), 'node_modules');
   beforeAll(() => {
-    mock(path.join(nodeModules, 'vendor-stache-in-loader'), {
-      getStacheConfig: () => {},
+    mock(path.join(nodeModules, 'vendor-sky-pages-in-loader'), {
+      getSkyPagesConfig: () => {},
       getWebpackConfig: () => {}
     });
-    mock(path.join(nodeModules, 'vendor-stache-in-error1'), {
+    mock(path.join(nodeModules, 'vendor-sky-pages-in-error1'), {
       getWebpackConfig: () => {}
     });
-    mock(path.join(nodeModules, 'vendor-stache-in-error2'), {
-      getStacheConfig: () => {}
+    mock(path.join(nodeModules, 'vendor-sky-pages-in-error2'), {
+      getSkyPagesConfig: () => {}
     });
 
     spyOn(fs, 'existsSync').and.callFake((file) => {
@@ -25,7 +25,7 @@ describe('stache-core webpack build', () => {
     });
     mock(path.join(process.cwd(), 'package.json'), {
       devDependencies: {
-        'vendor-stache-in-loader': '*'
+        'vendor-sky-pages-in-loader': '*'
       }
     });
   });
@@ -45,15 +45,15 @@ describe('stache-core webpack build', () => {
     expect(modules.length).toBe(0);
   });
 
-  it('should throw error if module is missing getStacheConfig', () => {
+  it('should throw error if module is missing getSkyPagesConfig', () => {
     expect(build.getModules.bind(null, {
-      devDependencies: { 'vendor-stache-in-error1': '*' }
+      devDependencies: { 'vendor-sky-pages-in-error1': '*' }
     })).toThrow();
   });
 
   it('should throw error if module is missing getWebpackConfig', () => {
     expect(build.getModules.bind(null, {
-      devDependencies: { 'vendor-stache-in-error2': '*' }
+      devDependencies: { 'vendor-sky-pages-in-error2': '*' }
     })).toThrow();
   });
 
@@ -61,15 +61,15 @@ describe('stache-core webpack build', () => {
     const modules = build.getModules({
       devDependencies: {
         'exclude-me': '*',
-        'vendor-stache-in-loader': '*'
+        'vendor-sky-pages-in-loader': '*'
       }
     });
     expect(modules.length).toBe(1);
   });
 
-  it('should return the default stacheConfig', () => {
-    const defaultStacheConfig = build.getDefaultStacheConfig();
-    expect(defaultStacheConfig).toEqual(jasmine.any(Object));
+  it('should return the default skyPagesConfig', () => {
+    const defaultSkyPagesConfig = build.getDefaultSkyPagesConfig();
+    expect(defaultSkyPagesConfig).toEqual(jasmine.any(Object));
   });
 
   it('should return the default webpackConfig', () => {

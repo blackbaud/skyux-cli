@@ -13,7 +13,7 @@ const logger = require('winston');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 
-describe('stache-core serve', () => {
+describe('sky-pages serve', () => {
   beforeAll(() => {
     spyOn(logger, 'info');
     spyOn(logger, 'error');
@@ -28,9 +28,9 @@ describe('stache-core serve', () => {
         port: 1337
       }
     });
-    const spyWebpackDevServer = function(compiler, config) {
+    const spyWebpackDevServer = function (compiler, config) {
       return {
-        listen: function(port, cb) {
+        listen: function (port, cb) {
           expect(serveConfig.getWebpackConfig().entry.app.length).toBe(2);
         }
       };
@@ -40,16 +40,16 @@ describe('stache-core serve', () => {
 
   it('should execute serve without opening url', function (done) {
     const stats = {
-      toJson: function() {
+      toJson: function () {
         return {
           errors: [],
           warnings: []
         };
       }
     };
-    const spyWebpack = function(config) {
+    const spyWebpack = function (config) {
       return {
-        plugin: function(eventName, cb) {
+        plugin: function (eventName, cb) {
           if (eventName === 'done') {
             logger.info.calls.reset();
             cb(stats);
@@ -60,9 +60,9 @@ describe('stache-core serve', () => {
         }
       };
     };
-    const spyWebpackDevServer = function(compiler, config) {
+    const spyWebpackDevServer = function (compiler, config) {
       return {
-        listen: function(port, cb) {
+        listen: function (port, cb) {
           cb();
         }
       };
@@ -72,16 +72,16 @@ describe('stache-core serve', () => {
 
   it('should handle the done event once', function (done) {
     const stats = {
-      toJson: function() {
+      toJson: function () {
         return {
           errors: [],
           warnings: []
         };
       }
     };
-    const spyWebpack = function(config) {
+    const spyWebpack = function (config) {
       return {
-        plugin: function(eventName, cb) {
+        plugin: function (eventName, cb) {
           if (eventName === 'done') {
             logger.info.calls.reset();
             cb(stats);
@@ -93,20 +93,20 @@ describe('stache-core serve', () => {
         }
       };
     };
-    const spyWebpackDevServer = function(compiler, config) {
+    const spyWebpackDevServer = function (compiler, config) {
       return {
-        listen: function(port, cb) {
+        listen: function (port, cb) {
           cb();
         }
       };
     };
-    serve({_: [], noAutoOpen: true }, spyWebpack, spyWebpackDevServer);
+    serve({ _: [], noAutoOpen: true }, spyWebpack, spyWebpackDevServer);
   });
 
   it('should handle no server errors', function (done) {
-    const spyWebpackDevServer = function(compiler, config) {
+    const spyWebpackDevServer = function (compiler, config) {
       return {
-        listen: function(port, cb) {
+        listen: function (port, cb) {
           cb();
           expect(logger.error).not.toHaveBeenCalled();
           done();
@@ -117,9 +117,9 @@ describe('stache-core serve', () => {
   });
 
   it('should handle server errors', function (done) {
-    const spyWebpackDevServer = function(compiler, config) {
+    const spyWebpackDevServer = function (compiler, config) {
       return {
-        listen: function(port, cb) {
+        listen: function (port, cb) {
           const err = 'MY-KNOWN-ERROR';
           cb(err);
           expect(logger.error).toHaveBeenCalledWith(err);
