@@ -31,11 +31,15 @@ const getModules = (packageJson) => {
  * @returns null
  */
 const runCommand = (modules, command, argv) => {
-  modules.forEach((module) => {
-    if (typeof module.runCommand === 'function') {
-      module.runCommand(command, argv);
-    }
-  });
+  if (command === 'new') {
+    require('./new')();
+  } else {
+    modules.forEach((module) => {
+      if (typeof module.runCommand === 'function') {
+        module.runCommand(command, argv);
+      }
+    });
+  }
 };
 
 /**
