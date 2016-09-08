@@ -5,7 +5,7 @@ const path = require('path');
 const promptly = require('promptly');
 const clone = require('git-clone');
 const fs = require('fs-extra');
-const spawn = require('child_process').spawn;
+const spawn = require('cross-spawn');
 
 const templateRepoUrl = 'https://github.com/blackbaud/sky-pages-template-skyux2';
 
@@ -44,7 +44,7 @@ module.exports = function () {
       if (err) {
         console.error(err);
       } else {
-        fs.remove(path.join(spaName, '.git'));
+        fs.removeSync(path.join(spaName, '.git'));
 
         fixUpPackageJson();
 
@@ -72,6 +72,9 @@ module.exports = function () {
 
     promptly.prompt(
       'What is the URL to your repo? (leave this blank if you don\'t know)',
+      {
+        'default': ''
+      },
       getRepoUrl
     );
   }
