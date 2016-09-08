@@ -31,15 +31,11 @@ const getModules = (packageJson) => {
  * @returns null
  */
 const runCommand = (modules, command, argv) => {
-  if (command === 'new') {
-    require('./new')();
-  } else {
-    modules.forEach((module) => {
-      if (typeof module.runCommand === 'function') {
-        module.runCommand(command, argv);
-      }
-    });
-  }
+  modules.forEach((module) => {
+    if (typeof module.runCommand === 'function') {
+      module.runCommand(command, argv);
+    }
+  });
 };
 
 /**
@@ -52,9 +48,14 @@ const processArgv = (argv) => {
   const packageJsonPath = path.join(process.cwd(), 'package.json');
   const command = argv._[0];
 
-  if (command === 'version') {
-    const packageJson = require(path.resolve(__dirname, 'package.json'));
-    logger.info('sky-pages-cli: %s', packageJson.version);
+  switch (command) {
+    case 'version':
+      const packageJson = require(path.resolve(__dirname, 'package.json'));
+      logger.info('sky-pages-cli: %s', packageJson.version);
+      break;
+    case 'new':
+      require('./new')();
+      break;
   }
 
   if (fs.existsSync(packageJsonPath)) {
