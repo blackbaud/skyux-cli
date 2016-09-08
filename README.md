@@ -13,5 +13,5 @@ To create a new SKY Pages SPA:
 - From the command line `cd` into a directory where your new project is to be created.
 - Run `sky-pages new` and answer the prompts.
 - Once the process completes there will be a new folder called `sky-pages-spa-<name-of-root-dir>` where `name-of-root-dir` is what you specified in the first prompt.  `cd` into this directory and run `sky-pages serve`.
-- Open a web browser and navigate to `https://localhost:31337/<name-of-root-dir>/'.
+- Open a web browser and navigate to `https://localhost:31337/<name-of-root-dir>/`.
 - As you make changes to your project the browser should reload your page automatically.
