@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/blackbaud/sky-pages#readme",
   "dependencies": {
+    "cross-spawn": "4.0.0",
     "fs-extra": "0.30.0",
     "git-clone": "0.1.0",
     "open": "0.0.5",
@@ -37,7 +38,6 @@
     "winston": "2.2.0"
   },
   "devDependencies": {
-    "cross-spawn": "4.0.0",
     "istanbul": "0.4.4",
     "jasmine": "2.4.1",
     "jscs": "3.0.7",
