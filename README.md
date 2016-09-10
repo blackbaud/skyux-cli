@@ -5,7 +5,7 @@ The command-line interface for the SKY Pages Builder.
 
 - Ensure you have Node v6+ and NPM v3+ (you can verify this by running `node -v` and `npm -v` at the command line)
 - From the command line run `npm install https://github.com/blackbaud/sky-pages-cli -g`
- 
+
 ## Usage
 
 To create a new SKY Pages SPA:
@@ -15,3 +15,13 @@ To create a new SKY Pages SPA:
 - Once the process completes there will be a new folder called `sky-pages-spa-<name-of-root-dir>` where `name-of-root-dir` is what you specified in the first prompt.  `cd` into this directory and run `sky-pages serve`.
 - Open a web browser and navigate to `https://localhost:31337/<name-of-root-dir>/`.
 - As you make changes to your project the browser should reload your page automatically.
+
+## Available Commands
+
+- `sky-pages serve`
+- `sky-pages build`
+- `sky-pages version`
+
+## Available Options
+
+`--noOpen` - Stop the host URL from opening when running `sky-pages serve
