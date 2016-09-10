@@ -46,7 +46,11 @@ const runCommand = (modules, command, argv) => {
  */
 const processArgv = (argv) => {
   const packageJsonPath = path.join(process.cwd(), 'package.json');
-  const command = argv._[0];
+  let command = argv._[0];
+
+  if (argv.v) {
+    command = 'version';
+  }
 
   switch (command) {
     case 'version':
