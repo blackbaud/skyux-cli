@@ -13,7 +13,7 @@ In order to load your local SPA into the SKY Pages Host you will need to add a c
 
 #### On Mac OS X
 
-- Open the Keychain Access application.  Under the Keychains list on the left, select "local" and then under the Category list select "Certificates."
+- Open the Keychain Access application.  Under the Keychains list on the left, select "login" and then under the Category list select "Certificates."
 - Drag `server.crt` into the list of certificates.
 - Double-click the new "localhost" item that should now be in the list to open the certificate's info window.
 - Expand the Trust section near the top of the info window, then select "Always Trust" option for "Secure Sockets Layer (SSL)".
