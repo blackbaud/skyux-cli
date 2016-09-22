@@ -3,7 +3,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const logger = require('winston');
 
 /**
  * Iterates object's devDependencies to find applicable modules.
@@ -54,11 +53,10 @@ const processArgv = (argv) => {
 
   switch (command) {
     case 'version':
-      const packageJson = require(path.resolve(__dirname, 'package.json'));
-      logger.info('sky-pages-cli: %s', packageJson.version);
+      require('./lib/version')(argv);
       break;
     case 'new':
-      require('./new')();
+      require('./lib/new')(argv);
       break;
   }
 
