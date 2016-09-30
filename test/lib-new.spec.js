@@ -1,45 +1,149 @@
 /*jshint jasmine: true, node: true */
 'use strict';
 
-const logger = require('winston');
+const fs = require('fs-extra');
 const promptly = require('promptly');
-const sendLine = (line) => {
+const mock = require('mock-require');
+const logger = require('winston');
+
+const sendLine = (line, cb) => {
   setImmediate(() => {
     process.stdin.emit('data', line + '\n');
+    cb();
   });
-}
+};
+
+let stdout = null;
+let customError = '';
+
+const oldWrite = process.stdout.write;
+process.stdout.write = function (data) {
+  stdout += data;
+  return oldWrite.apply(process.stdout, arguments);
+};
+
+beforeEach(() => {
+  spyOn(promptly, 'prompt').and.callThrough();
+  mock('git-clone', (url, path, cb) => {
+    cb(customError);
+  });
+  mock('cross-spawn', () => ({
+    on: (evt) => {
+      console.log(evt);
+    }
+  }));
+  customError = null;
+  stdout = '';
+});
 
 describe('sky-pages new command', () => {
-  beforeEach(() => {
-    spyOn(logger, 'error');
-    spyOn(promptly, 'prompt').and.callThrough();
+
+  it('should ask for a spa name and url', (done) => {
+    spyOn(fs, 'readJsonSync').and.returnValue({});
+    spyOn(fs, 'writeJsonSync');
+
+    require('../lib/new')();
+    sendLine('a', () => {
+      sendLine('', () => {
+        expect(stdout).toContain(
+          'What is the root directory for your SPA? (example: my-spa-name)'
+        );
+        expect(stdout).toContain(
+          'What is the URL to your repo? (leave this blank if you don\'t know)'
+        );
+        done();
+      });
+    });
   });
 
   it('should catch a spa name with invalid characters', (done) => {
-    const name = 'This Is Invalid';
-    const cmd = require('../lib/new');
-
-    cmd().then(() => {
-      console.log('DO I GET HERE?');
-      expect(logger.error).toHaveBeenCalled();
+    require('../lib/new')();
+    sendLine('This Is Invalid', () => {
+      expect(stdout).toContain(
+        'SPA root directories may only contain lower-case letters, numbers or dashes.\n'
+      );
       done();
     });
-    sendLine(name);
   });
 
-  // it('should catch a spa name that already locally exists', () => {
-  //   const name = 'spazen';
-  //   require('../lib/new')();
-  //
-  //   process.stdin.emit('data', name + '\n');
-  //   expect(promptly.prompt).toHaveBeenCalled();
-  // });
+  it('should catch a spa directory that already exists', (done) => {
+    spyOn(fs, 'existsSync').and.returnValue(true);
+    require('../lib/new')();
+    sendLine('b', () => {
+      expect(stdout).toContain(
+        'SPA directory already exists.\n'
+      );
+      done();
+    });
+  });
 
-  // it('should accepts a valid spa name', () => {
-  //   const name = 'spazen';
-  //   require('../lib/new')();
-  //
-  //   process.stdin.emit('data', name + '\n');
-  //   expect(promptly.prompt).toHaveBeenCalled();
-  // });
+  it('should handle an error cloning the template', (done) => {
+    customError = 'CUSTOM-ERROR1';
+    spyOn(fs, 'existsSync').and.returnValue(false);
+    spyOn(logger, 'error');
+    require('../lib/new')();
+    sendLine('e', () => {
+      sendLine('', () => {
+        expect(logger.error).toHaveBeenCalledWith('CUSTOM-ERROR1');
+        done();
+      });
+    });
+  });
+
+  it('should handle an error cloning the repo', (done) => {
+    customError = 'CUSTOM-ERROR2';
+    spyOn(fs, 'existsSync').and.returnValue(false);
+    spyOn(logger, 'error');
+    require('../lib/new')();
+    sendLine('f', () => {
+      sendLine('g', () => {
+        expect(logger.error).toHaveBeenCalledWith('CUSTOM-ERROR2');
+        done();
+      });
+    });
+  });
+
+  it('should handle a non-empty repo when cloning', (done) => {
+    spyOn(fs, 'existsSync').and.returnValue(false);
+    spyOn(fs, 'readdirSync').and.returnValue([
+      '.git',
+      'README.md',
+      '.gitignore',
+      'repo-not-empty'
+    ]);
+    spyOn(logger, 'info');
+    require('../lib/new')();
+    sendLine('h', () => {
+      sendLine('i', () => {
+        expect(logger.info).toHaveBeenCalledWith(
+          'sky-pages new only works with empty repositories.'
+        );
+        done();
+      });
+    });
+  });
+
+  it('should ignore .git and README.md files when cloning', (done) => {
+    spyOn(fs, 'existsSync').and.returnValue(false);
+    spyOn(fs, 'readdirSync').and.returnValue([
+      '.git',
+      'README.md',
+      '.gitignore'
+    ]);
+    spyOn(fs, 'readJsonSync').and.returnValue({});
+    spyOn(fs, 'writeJsonSync');
+    spyOn(fs, 'removeSync');
+    spyOn(fs, 'copy').and.callFake((tmp, path, settings, cb) => {
+      cb();
+    });
+    spyOn(logger, 'info');
+    require('../lib/new')();
+    sendLine('j', () => {
+      sendLine('k', () => {
+        expect(logger.info).toHaveBeenCalledWith('Running npm install');
+        done();
+      });
+    });
+  });
+
 });
