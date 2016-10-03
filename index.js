@@ -3,6 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const logger = require('winston');
 
 /**
  * Iterates object's devDependencies to find applicable modules.
@@ -14,10 +15,13 @@ const getModules = (packageJson) => {
 
   if (packageJson.devDependencies) {
     for (let d in packageJson.devDependencies) {
+      /* istanbul ignore else */
       if (/(.*)-sky-pages-out-(.*)/gi.test(d)) {
         modules.push(require(path.join(process.cwd(), 'node_modules', d)));
       }
     }
+  } else {
+    logger.info('package.json contains no devDependencies');
   }
 
   return modules;
@@ -33,6 +37,8 @@ const runCommand = (modules, command, argv) => {
   modules.forEach((module) => {
     if (typeof module.runCommand === 'function') {
       module.runCommand(command, argv);
+    } else {
+      logger.warn('Found matching module without exposed runCommand - %s', module);
     }
   });
 };
@@ -58,11 +64,16 @@ const processArgv = (argv) => {
     case 'new':
       require('./lib/new')(argv);
       break;
+    default:
+      logger.info('SKY Pages processing command %s', command);
+      break;
   }
 
   if (fs.existsSync(packageJsonPath)) {
     const modules = getModules(require(packageJsonPath));
     runCommand(modules, command, argv);
+  } else {
+    logger.info('No package.json file found in current working directory.');
   }
 };
 
