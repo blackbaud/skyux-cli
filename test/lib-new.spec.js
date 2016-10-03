@@ -5,6 +5,8 @@ const fs = require('fs-extra');
 const promptly = require('promptly');
 const mock = require('mock-require');
 const logger = require('winston');
+const EventEmitter = require('events').EventEmitter;
+const emitter = new EventEmitter();
 
 const sendLine = (line, cb) => {
   setImmediate(() => {
@@ -27,11 +29,7 @@ beforeEach(() => {
   mock('git-clone', (url, path, cb) => {
     cb(customError);
   });
-  mock('cross-spawn', () => ({
-    on: (evt) => {
-      console.log(evt);
-    }
-  }));
+  mock('cross-spawn', () => emitter);
   customError = null;
   stdout = '';
 });
@@ -123,7 +121,7 @@ describe('sky-pages new command', () => {
     });
   });
 
-  it('should ignore .git and README.md files when cloning', (done) => {
+  it('should ignore .git and README.md files when cloning and run npm install', (done) => {
     spyOn(fs, 'existsSync').and.returnValue(false);
     spyOn(fs, 'readdirSync').and.returnValue([
       '.git',
@@ -140,7 +138,11 @@ describe('sky-pages new command', () => {
     require('../lib/new')();
     sendLine('j', () => {
       sendLine('k', () => {
+        emitter.emit('exit');
         expect(logger.info).toHaveBeenCalledWith('Running npm install');
+        expect(logger.info).toHaveBeenCalledWith(
+          'Change into that directory and run "sky-pages serve" to begin.'
+        );
         done();
       });
     });
