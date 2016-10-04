@@ -9,7 +9,7 @@ The command-line interface for the SKY Pages Builder.
 ### Installing SSL Certificate
 In order to load your local SPA into the SKY Pages Host you will need to add a certificate to your computer's Trusted Roots list.
 
-- Navigate to https://github.com/blackbaud/sky-pages-out-skyux2/tree/master/ssl and download `server.crt`.
+- Download `server.crt` from https://raw.githubusercontent.com/blackbaud/sky-pages-out-skyux2/master/ssl/server.crt.
 
 #### On Mac OS X
 
@@ -18,6 +18,17 @@ In order to load your local SPA into the SKY Pages Host you will need to add a c
 - Double-click the new "localhost" item that should now be in the list to open the certificate's info window.
 - Expand the Trust section near the top of the info window, then select "Always Trust" option for "Secure Sockets Layer (SSL)".
 - Close the info window.
+
+#### On Windows
+
+- Start Microsoft Management Console (MMC) Tool. Click Start -> Run -> Enter 'MMC' and click 'OK'
+- Click File -> Add/Remove Snap-In...
+- Add Certificate. ...
+- Select 'Computer Account' option and click 'Next'
+- Click 'Finish'
+- Click 'OK'
+- Select the `server.crt` you downloaded from the link above
+- Click Next.
 
 ## Usage
 
