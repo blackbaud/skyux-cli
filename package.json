@@ -7,11 +7,11 @@
     "sky-pages": "bin/sky-pages.js"
   },
   "scripts": {
-    "istanbul": "istanbul cover --report=html jasmine JASMINE_CONFIG_PATH=jasmine.json",
+    "coverage": "istanbul cover --report=html jasmine JASMINE_CONFIG_PATH=jasmine.json",
     "jscs": "jscs bin lib",
     "jshint": "jshint bin lib",
     "lint": "npm run jshint && npm run jscs",
-    "test": "npm run lint && npm run istanbul"
+    "test": "npm run lint && npm run coverage"
   },
   "repository": {
     "type": "git",
