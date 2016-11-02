@@ -10,7 +10,7 @@ const logger = require('winston');
  * @name getModules
  * @returns [module[]] modules
  */
-const getModules = (packageJson) => {
+function getModules(packageJson) {
   let modules = [];
 
   if (packageJson.devDependencies) {
@@ -22,7 +22,7 @@ const getModules = (packageJson) => {
   }
 
   return modules;
-};
+}
 
 /**
  * Iterates an array of modules.
@@ -30,13 +30,13 @@ const getModules = (packageJson) => {
  * @name runCommand
  * @returns null
  */
-const runCommand = (modules, command, argv) => {
+function runCommand(modules, command, argv) {
   modules.forEach((module) => {
     if (typeof module.runCommand === 'function') {
       module.runCommand(command, argv);
     }
   });
-};
+}
 
 /**
  * Processes an argv object.
@@ -44,7 +44,7 @@ const runCommand = (modules, command, argv) => {
  * @name processArgv
  * @param [Object] argv
  */
-const processArgv = (argv) => {
+function processArgv(argv) {
   const packageJsonPath = path.join(process.cwd(), 'package.json');
   let command = argv._[0];
 
@@ -66,6 +66,6 @@ const processArgv = (argv) => {
     const modules = getModules(require(packageJsonPath));
     runCommand(modules, command, argv);
   }
-};
+}
 
 module.exports = processArgv;
