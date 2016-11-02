@@ -10,7 +10,7 @@ const logger = require('winston');
  * @name getModules
  * @returns [module[]] modules
  */
-const getModules = (packageJson) => {
+function getModules(packageJson) {
   let modules = [];
 
   if (packageJson.devDependencies) {
@@ -25,7 +25,7 @@ const getModules = (packageJson) => {
   }
 
   return modules;
-};
+}
 
 /**
  * Iterates an array of modules.
@@ -33,7 +33,7 @@ const getModules = (packageJson) => {
  * @name runCommand
  * @returns null
  */
-const runCommand = (modules, command, argv) => {
+function runCommand(modules, command, argv) {
   modules.forEach((module) => {
     if (typeof module.runCommand === 'function') {
       module.runCommand(command, argv);
@@ -41,7 +41,7 @@ const runCommand = (modules, command, argv) => {
       logger.warn('Found matching module without exposed runCommand - %s', module);
     }
   });
-};
+}
 
 /**
  * Processes an argv object.
@@ -49,7 +49,7 @@ const runCommand = (modules, command, argv) => {
  * @name processArgv
  * @param [Object] argv
  */
-const processArgv = (argv) => {
+function processArgv(argv) {
   const packageJsonPath = path.join(process.cwd(), 'package.json');
   let command = argv._[0];
 
@@ -75,6 +75,6 @@ const processArgv = (argv) => {
   } else {
     logger.info('No package.json file found in current working directory.');
   }
-};
+}
 
 module.exports = processArgv;
