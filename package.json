@@ -1,6 +1,6 @@
 {
   "name": "blackbaud-sky-pages",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -30,12 +30,7 @@
     "git-clone": "0.1.0",
     "minimist": "1.2.0",
     "open": "0.0.5",
-    "progress-bar-webpack-plugin": "1.9.0",
     "promptly": "2.1.0",
-    "webpack": "1.13.1",
-    "webpack-dev-server": "1.14.1",
-    "webpack-fail-plugin": "1.0.5",
-    "webpack-merge": "0.14.0",
     "winston": "2.2.0"
   },
   "devDependencies": {
