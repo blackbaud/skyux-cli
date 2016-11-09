@@ -43,16 +43,12 @@ To create a new SKY Pages SPA:
 
 - `sky-pages serve`
 - `sky-pages build`
-- `sky-pages version`
+- `sky-pages version` or `sky-pages -v`
+- `sky-pages test`
+- `sky-pages watch`
+- `sky-pages e2e`
 
 ## Available Options
 
-`--noOpen` - Stop the host URL from opening when running `sky-pages serve`
-
-## Building sky-pages-cli (Available dev commands)
-
-- `npm run coverage` Runs our unit spec tests, saving coverage to the `coverage/` directory.
-- `npm run jscs`  Runs this code against the jscs linter.
-- `npm run jshint` Runs this code against the jshint linter.
-- `npm run lint` Runs the `jscs` and `jshint` commands.
-- `npm run test` Runs ALL test commands combined.
+`--noOpen` - Stop the host URL from opening when calling `sky-pages serve`
+`--noServe` - Stops the serve command from automatically running when calling `sky-pages e2e`
