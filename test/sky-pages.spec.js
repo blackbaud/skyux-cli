@@ -42,6 +42,43 @@ describe('sky-pages CLI', () => {
     expect(called).toEqual(true);
   });
 
+  it('should pass version command to devDependencies', () => {
+    let called = false;
+    spyOn(logger, 'info');
+    spyOn(fs, 'existsSync').and.returnValue(false);
+    mock('../lib/version', () => {
+      called = true;
+    });
+
+    const cli = require('../index');
+    cli({ _: ['version'] });
+    expect(called).toEqual(true);
+    expect(logger.info).toHaveBeenCalledWith('No package.json file found in current working directory.');
+  });
+
+  it('should pass unknown command to devDependencies', () => {
+    spyOn(logger, 'info');
+    spyOn(fs, 'existsSync').and.returnValue(false);
+
+    const cli = require('../index');
+    cli({ _: ['test'] });
+    expect(logger.info).toHaveBeenCalledTimes(2);
+  });
+
+  it('should not pass new command to devDependencies', () => {
+    let called = false;
+    spyOn(logger, 'info');
+    spyOn(fs, 'existsSync').and.returnValue(false);
+    mock('../lib/new', () => {
+      called = true;
+    });
+
+    const cli = require('../index');
+    cli({ _: ['new'] });
+    expect(called).toEqual(true);
+    expect(logger.info).not.toHaveBeenCalled();
+  });
+
   it('should accept unknown command', () => {
     spyOn(logger, 'info');
 

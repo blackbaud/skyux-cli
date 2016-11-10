@@ -52,7 +52,9 @@ function runCommand(modules, command, argv) {
 function processArgv(argv) {
   const packageJsonPath = path.join(process.cwd(), 'package.json');
   let command = argv._[0];
+  let passToModules = true;
 
+  // Allow shorthand "-v" for version
   if (argv.v) {
     command = 'version';
   }
@@ -63,18 +65,23 @@ function processArgv(argv) {
       break;
     case 'new':
       require('./lib/new')(argv);
+      passToModules = false;
       break;
     default:
       logger.info('SKY Pages processing command %s', command);
       break;
   }
 
-  if (fs.existsSync(packageJsonPath)) {
-    const modules = getModules(require(packageJsonPath));
-    runCommand(modules, command, argv);
-  } else {
-    logger.info('No package.json file found in current working directory.');
+  // CLI handles new command without passing through to modules
+  if (passToModules) {
+    if (fs.existsSync(packageJsonPath)) {
+      const modules = getModules(require(packageJsonPath));
+      runCommand(modules, command, argv);
+    } else {
+      logger.info('No package.json file found in current working directory.');
+    }
   }
+
 }
 
 module.exports = processArgv;
