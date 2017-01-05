@@ -16,7 +16,7 @@ function getModules(packageJson) {
   if (packageJson.devDependencies) {
     for (let d in packageJson.devDependencies) {
       /* istanbul ignore else */
-      if (/(.*)-sky-pages-out-(.*)/gi.test(d)) {
+      if (/(.*)skyux-builder(.*)/gi.test(d)) {
         modules.push(require(path.join(process.cwd(), 'node_modules', d)));
       }
     }
