@@ -34,7 +34,7 @@ beforeEach(() => {
   stdout = '';
 });
 
-describe('sky-pages new command', () => {
+describe('skyux new command', () => {
 
   it('should ask for a spa name and url', (done) => {
     spyOn(fs, 'readJsonSync').and.returnValue({});
@@ -114,7 +114,7 @@ describe('sky-pages new command', () => {
     sendLine('h', () => {
       sendLine('i', () => {
         expect(logger.info).toHaveBeenCalledWith(
-          'sky-pages new only works with empty repositories.'
+          'skyux new only works with empty repositories.'
         );
         done();
       });
@@ -141,7 +141,7 @@ describe('sky-pages new command', () => {
         emitter.emit('exit');
         expect(logger.info).toHaveBeenCalledWith('Running npm install');
         expect(logger.info).toHaveBeenCalledWith(
-          'Change into that directory and run "sky-pages serve" to begin.'
+          'Change into that directory and run "skyux serve" to begin.'
         );
         done();
       });

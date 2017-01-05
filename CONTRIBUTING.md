@@ -1,4 +1,4 @@
-# Contributing to SKY Pages
+# Contributing to SKY UX
 
 - `npm run coverage` Runs our unit spec tests, saving coverage to the `coverage/` directory.
 - `npm run jscs`  Runs this code against the jscs linter.

@@ -7,7 +7,7 @@ const mock = require('mock-require');
 const proxyquire = require('proxyquire');
 const logger = require('winston');
 
-describe('sky-pages CLI', () => {
+describe('skyux CLI', () => {
 
   it('should accept known command version', () => {
     let called = false;
@@ -119,16 +119,16 @@ describe('sky-pages CLI', () => {
     stubs[path.join(process.cwd(), 'package.json')] = {
       '@noCallThru': true,
       devDependencies: {
-        'blackbaud-sky-pages-out-test1': '0.0.1',
-        'blackbaud-sky-pages-out-test2': '0.0.1'
+        'blackbaud-skyux-builder-test1': '0.0.1',
+        'blackbaud-skyux-builder-test2': '0.0.1'
       }
     };
 
-    stubs[path.join(process.cwd(), 'node_modules', 'blackbaud-sky-pages-out-test1')] = {
+    stubs[path.join(process.cwd(), 'node_modules', 'blackbaud-skyux-builder-test1')] = {
       '@noCallThru': true
     };
 
-    stubs[path.join(process.cwd(), 'node_modules', 'blackbaud-sky-pages-out-test2')] = {
+    stubs[path.join(process.cwd(), 'node_modules', 'blackbaud-skyux-builder-test2')] = {
       '@noCallThru': true,
       runCommand: () => {
         called = true;

@@ -5,7 +5,7 @@ const path = require('path');
 const proxyquire = require('proxyquire');
 const logger = require('winston');
 
-describe('sky-pages version command', () => {
+describe('skyux version command', () => {
   it('should return the version from package.json', () => {
     spyOn(logger, 'info');
     const version = 'this.should.match';
