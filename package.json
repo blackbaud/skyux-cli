@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/blackbaud/sky-pages.git"
+    "url": "git+https://github.com/blackbaud/skyux-cli.git"
   },
   "engines": {
     "node": ">= 6.9.1"
@@ -25,9 +25,9 @@
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/blackbaud/sky-pages/issues"
+    "url": "https://github.com/blackbaud/skyux-cli/issues"
   },
-  "homepage": "https://github.com/blackbaud/sky-pages#readme",
+  "homepage": "https://github.com/blackbaud/skyux-cli#readme",
   "dependencies": {
     "cross-spawn": "4.0.0",
     "fs-extra": "0.30.0",

@@ -1,15 +1,15 @@
-# sky-pages-cli
+# skyux-cli
 The command-line interface for the SKY Pages Builder.
 
 ## Installation
 
 - Ensure you have Node v6+ and NPM v3+ (you can verify this by running `node -v` and `npm -v` at the command line)
-- From the command line run `npm install https://github.com/blackbaud/sky-pages-cli -g`
+- From the command line run `npm install @blackbaud/skyux-cli -g`
 
 ### Installing SSL Certificate
 In order to load your local SPA into the SKY Pages Host you will need to add a certificate to your computer's Trusted Roots list.
 
-- Download `server.crt` from https://raw.githubusercontent.com/blackbaud/sky-pages-out-skyux2/master/ssl/server.crt.
+- Download `server.crt` from https://raw.githubusercontent.com/blackbaud/skyux-builder/master/ssl/server.crt.
 
 #### On Mac OS X
 
@@ -35,20 +35,20 @@ In order to load your local SPA into the SKY Pages Host you will need to add a c
 To create a new SKY Pages SPA:
 
 - From the command line `cd` into a directory where your new project is to be created.
-- Run `sky-pages new` and answer the prompts.
-- Once the process completes there will be a new folder called `sky-pages-spa-<name-of-root-dir>` where `name-of-root-dir` is what you specified in the first prompt.  `cd` into this directory and run `sky-pages serve`.  This will open the SKY Pages Host site in your default browser and run your SPA.
+- Run `skyux new` and answer the prompts.
+- Once the process completes there will be a new folder called `skyux-spa-<name-of-root-dir>` where `name-of-root-dir` is what you specified in the first prompt.  `cd` into this directory and run `skyux serve`.  This will open the SKY Pages Host site in your default browser and run your SPA.
 - As you make changes to your project the browser should reload your page automatically.
 
 ## Available Commands
 
-- `sky-pages serve`
-- `sky-pages build`
-- `sky-pages version` or `sky-pages -v`
-- `sky-pages test`
-- `sky-pages watch`
-- `sky-pages e2e`
+- `skyux serve`
+- `skyux build`
+- `skyux version` or `skyux -v`
+- `skyux test`
+- `skyux watch`
+- `skyux e2e`
 
 ## Available Options
 
-`--noOpen` - Stop the host URL from opening when calling `sky-pages serve`
-`--noServe` - Stops the serve command from automatically running when calling `sky-pages e2e`
+- `--noOpen` - Stop the host URL from opening when calling `skyux serve`
+- `--noServe` - Stops the serve command from automatically running when calling `skyux e2e`
