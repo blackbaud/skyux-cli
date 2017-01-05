@@ -68,7 +68,7 @@ function processArgv(argv) {
       passToModules = false;
       break;
     default:
-      logger.info('SKY Pages processing command %s', command);
+      logger.info('SKY UX processing command %s', command);
       break;
   }
 
