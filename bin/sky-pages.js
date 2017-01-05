@@ -1,7 +1,4 @@
 #!/usr/bin/env node
 'use strict';
 
-const minimist = require('minimist');
-const cli = require('../index');
-
-cli(minimist(process.argv.slice(2)));
+console.error('The "sky-pages" command has been deprecated.  Please use "skyux".');

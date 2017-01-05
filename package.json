@@ -1,10 +1,11 @@
 {
-  "name": "blackbaud-sky-pages",
+  "name": "@blackbaud/skyux-cli",
   "version": "0.0.5",
   "description": "",
   "main": "index.js",
   "bin": {
-    "sky-pages": "bin/sky-pages.js"
+    "sky-pages": "bin/sky-pages.js",
+    "skyux": "bin/skyux.js"
   },
   "scripts": {
     "coverage": "istanbul cover --report=html jasmine JASMINE_CONFIG_PATH=jasmine.json",
