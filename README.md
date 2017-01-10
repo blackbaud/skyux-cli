@@ -9,13 +9,13 @@ The command-line interface for the SKY UX Builder.
 ### Installing SSL Certificate
 In order to load your local SPA into the SKY UX Host you will need to add a certificate to your computer's Trusted Roots list.
 
-- Download `server.crt` from https://raw.githubusercontent.com/blackbaud/skyux-builder/master/ssl/server.crt.
+- Download the raw [skyux-ca.crt](https://raw.githubusercontent.com/blackbaud/skyux-builder/master/ssl/skyux-ca.crt) root certificate file.
 
 #### On Mac OS X
 
 - Open the Keychain Access application.  Under the Keychains list on the left, select "login" and then under the Category list select "Certificates."
-- Drag `server.crt` into the list of certificates.
-- Double-click the new "localhost" item that should now be in the list to open the certificate's info window.
+- Drag `skyux-ca.crt` into the list of certificates.
+- Double-click the new "SKY UX" item that should now be in the list to open the certificate's info window.
 - Expand the Trust section near the top of the info window, then select "Always Trust" option for "Secure Sockets Layer (SSL)".
 - Close the info window.
 
@@ -27,7 +27,7 @@ In order to load your local SPA into the SKY UX Host you will need to add a cert
 - Select 'Computer Account' option and click 'Next'
 - Click 'Finish'
 - Click 'OK'
-- Select the `server.crt` you downloaded from the link above
+- Select the `skyux-ca.crt` you downloaded from the link above
 - Click Next.
 
 ## Usage
