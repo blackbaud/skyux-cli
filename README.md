@@ -7,7 +7,7 @@ The command line interface for the SKY UX Builder.
 - For Mac OS X, we recommend that you use [Node Version Manager (nvm)](https://github.com/creationix/nvm) to wrap your NodeJS installation so that it installs in your user directory and avoids permission-related issues. 
 - From the command line, run `npm install @blackbaud/skyux-cli -g`.
 
-### Instal SSL Certificate
+### Install SSL Certificate
 To load your local SPA into the SKY UX Host, you need to add a certificate to your computer's Trusted Roots list.
 
 - Download the raw [skyux-ca.crt](https://raw.githubusercontent.com/blackbaud/skyux-builder/master/ssl/skyux-ca.crt) root certificate file.
