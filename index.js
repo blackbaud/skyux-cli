@@ -59,13 +59,22 @@ function processArgv(argv) {
     command = 'version';
   }
 
+  // Allow shorthand "-h" for help
+  if (argv.h) {
+    command = 'help';
+  }
+
   switch (command) {
     case 'version':
-      require('./lib/version')(argv);
+      require('./lib/version').logVersion(argv);
       break;
     case 'new':
       require('./lib/new')(argv);
       passToModules = false;
+      break;
+    case 'help':
+    case undefined:
+      require('./lib/help')(argv);
       break;
     default:
       logger.info('SKY UX processing command %s', command);
