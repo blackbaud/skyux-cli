@@ -51,5 +51,7 @@ To create a SKY UX SPA:
 
 ## Available Options
 
-- `--noOpen` - Stops the host URL from opening when calling `skyux serve`.
+- `-launch host` - Launches the host URL when running `skyux serve` (Default).
+- `-launch local` - Launches the local URL when running `skyux serve`.
+- `-launch none` - Stops any URL from launching when running `skyux serve`.
 - `--noServe` - Stops the `serve` command from automatically running when calling `skyux e2e`.
