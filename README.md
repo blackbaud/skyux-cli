@@ -22,14 +22,9 @@ To load your local SPA into the SKY UX Host, you need to add a certificate to yo
 
 #### On Windows
 
-- Start Microsoft Management Console (MMC) Tool. Click Start -> Run -> Enter "MMC" and click "OK."
-- Click File -> Add/Remove Snap-In...
-- Add Certificate. ...
-- Select "Computer Account" option and click "Next."
-- Click "Finish."
-- Click "OK."
-- Select the `skyux-ca.crt` you downloaded from the link above.
-- Click "Next."
+From an elevated PowerShell command prompt, change the current directory to the one that you downloaded the skyux-ca.crt to and run this command:
+
+Import-Certificate -FilePath "skyux-ca.crt" -CertStoreLocation Cert:\LocalMachine\Root\
 
 ## Usage
 

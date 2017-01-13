@@ -11,8 +11,10 @@ describe('skyux CLI', () => {
 
   it('should accept known command version', () => {
     let called = false;
-    mock('../lib/version', () => {
-      called = true;
+    mock('../lib/version', {
+      logVersion: () => {
+        called = true;
+      }
     });
 
     const cli = require('../index');
@@ -22,12 +24,36 @@ describe('skyux CLI', () => {
 
   it('should accept the -v flag', () => {
     let called = false;
-    mock('../lib/version', () => {
-      called = true;
+    mock('../lib/version', {
+      logVersion: () => {
+        called = true;
+      }
     });
 
     const cli = require('../index');
     cli({ _: [''], v: true });
+    expect(called).toEqual(true);
+  });
+
+  it('should accept the -h flag', () => {
+    let called = false;
+    mock('../lib/help', () => {
+      called = true;
+    });
+
+    const cli = require('../index');
+    cli({ _: [''], h: true });
+    expect(called).toEqual(true);
+  });
+
+  it('should default to the help command', () => {
+    let called = false;
+    mock('../lib/help', () => {
+      called = true;
+    });
+
+    const cli = require('../index');
+    cli({ _: [undefined] });
     expect(called).toEqual(true);
   });
 
@@ -46,8 +72,10 @@ describe('skyux CLI', () => {
     let called = false;
     spyOn(logger, 'info');
     spyOn(fs, 'existsSync').and.returnValue(false);
-    mock('../lib/version', () => {
-      called = true;
+    mock('../lib/version', {
+      logVersion: () => {
+        called = true;
+      }
     });
 
     const cli = require('../index');
