@@ -35,6 +35,7 @@
     "minimist": "1.2.0",
     "open": "0.0.5",
     "promptly": "2.1.0",
+    "update-notifier": "1.0.3",
     "winston": "2.2.0"
   },
   "devDependencies": {
