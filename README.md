@@ -1,4 +1,8 @@
 # skyux-cli
+
+[![npm](https://img.shields.io/npm/v/@blackbaud/skyux-cli.svg)](https://www.npmjs.com/package/@blackbaud/skyux-cli)
+[![status](https://travis-ci.org/blackbaud/skyux-cli.svg?branch=master)](https://travis-ci.org/blackbaud/skyux-cli)
+
 The command line interface for the SKY UX Builder.
 
 ## Installation
