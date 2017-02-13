@@ -113,7 +113,7 @@ externals: {
 
 ### Unit Testing
 
-We automatically configure [Karma](https://karma-runner.github.io) to run unit tests matching the  `test/*.spec.ts` pattern. Checkout the example included in our template via `skyux new` or learn more about [writing unit tests](https://angular.io/docs/ts/latest/testing/) in SKY UX.
+We automatically configure [Karma](https://karma-runner.github.io) to run unit tests matching the  `*.spec.ts` pattern.  We suggest following the [Angular2 Style Guide](https://angular.io/styleguide#!#naming) regarding what to name your spec files and where to store them.  Checkout the example included in our template via `skyux new` or learn more about [writing unit tests](https://angular.io/docs/ts/latest/testing/) in SKY UX.
 
 Use `skyux test` to run your tests, or `skyux watch` everytime you make a change to a spec file.
 
