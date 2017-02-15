@@ -26,9 +26,18 @@ To load your local SPA into the SKY UX Host, you need to add a certificate to yo
 
 #### On Windows
 
-From an elevated PowerShell command prompt, change the current directory to the one that you downloaded the skyux-ca.crt to and run this command:
-
-Import-Certificate -FilePath "skyux-ca.crt" -CertStoreLocation Cert:\LocalMachine\Root\
+- Right-click the skyux-ca.crt URL, and select Save As.
+- Open the file.
+- On the security warning prompt, click Open.
+- On the Certificate screen, click Install Certificate.
+- On the Certificate Import Wizard, click Next.
+- Select Place all certificates in the following store, and then click Browse.
+- On the Select Certificate Store screen, select Trusted Root Certification Authorities, and then click OK.
+- On the Certificate Import Wizard, click Next.
+- Click Finish.
+- On the security warning prompt, click Yes.
+- On the Certificate Import Wizard confirmation prompt, click OK.
+- After you return to the Certificate screen, click OK.
 
 ## Usage
 
