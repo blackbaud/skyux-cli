@@ -66,7 +66,7 @@ To create a SKY UX SPA:
 
 In your project's directory, you can use a `skyuxconfig.json` file to configure certain aspects of the SKY UX process.  Some of the values are defined in SKY UX Builder and will not be included in the default `skyuxconfig.json` that comes from running `skyux new`.
 
-- `name`: The "name" of your project when running in SKY UX Host.  For example "demo" would mean your SPA is accessible from `https://sky.blackbaud-dev.com/demo`.  This property is optional as by default, this property is read from your `package.json` file.
+- `name`: The "name" of your project when running in SKY UX Host.  For example "demo" would mean your SPA is accessible from `https://sky.blackbaud-dev.com/demo`.  This property is optional and by default, this property is read from your `package.json` file.
 - `mode`: Allows you to control how much boilerplate code is automatically generated. This property will eventually become obsolete as the CLI continues to be built, where individual steps are overridable without having to switch completely into advanced mode.  Possible values are `easy` (default) or `advanced`.
 - `compileMode`: Configure ahead-of-time or just-in-time compilation.  Possible values are `aot` (default) or  `jit`.
 - `host`: Configuration options related to communication with SKY UX Host.
