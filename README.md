@@ -115,7 +115,7 @@ externals: {
 
 ## Helpers
 
-- `import { SkyAuthHttp } from '@blackbaud/skyux-builder/runtime'` In conjunction with `auth: true` in your `skyuxconfig.json` file, we've provided a wrapper to the `http` utility class.  Using `SkyAuthHttp.get()` will automatically add the necessary Authorization header continaing the bearer token received from authentication.
+- `import { SkyAuthHttp } from '@blackbaud/skyux-builder/runtime'` In conjunction with `auth: true` in your `skyuxconfig.json` file, we've provided a wrapper to the `http` utility class.  Using `SkyAuthHttp.get()` will automatically add the necessary Authorization header containing the bearer token received from authentication.
 - `import { SkyHostBrowser } from '@blackbaud/skyux-builder/runtime/testing'` Particularly useful when running `skyux e2e`, use `SkyHostBrowser.get()` to automatically add the SKY UX Host base url, as well as the necessary configuration object to enable local development mode.  For example, `SkyHostBrowser.get(/my-page?my-qs=1');`
 
 ## Testing
