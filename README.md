@@ -111,6 +111,7 @@ externals: {
       }
     ]
   }
+}
 ```
 
 ## Helpers
