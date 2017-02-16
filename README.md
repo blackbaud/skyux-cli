@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/@blackbaud/skyux-cli.svg)](https://www.npmjs.com/package/@blackbaud/skyux-cli)
 [![status](https://travis-ci.org/blackbaud/skyux-cli.svg?branch=master)](https://travis-ci.org/blackbaud/skyux-cli)
 
-The command line interface for the SKY UX Builder.
+The command line interface for the SKY UX Builder. For documentation on working with the SKY UX CLI, see [the Learn section of the SKY UX 2 website](https://developer.blackbaud.com/skyux2/learn). 
 
 ## Installation
 
@@ -11,7 +11,7 @@ The command line interface for the SKY UX Builder.
 - For Mac OS X, we recommend that you use [Node Version Manager (nvm)](https://github.com/creationix/nvm) to wrap your NodeJS installation so that it installs in your user directory and avoids permission-related issues. 
 - From the command line, run `npm install @blackbaud/skyux-cli -g`.
 
-### Install SSL Certificate
+### Install SSL certificate
 To load your local SPA into the SKY UX Host, you need to add a certificate to your computer's Trusted Roots list.
 
 - Download the raw [skyux-ca.crt](https://raw.githubusercontent.com/blackbaud/skyux-builder/master/ssl/skyux-ca.crt) root certificate file.
@@ -48,35 +48,36 @@ To create a SKY UX SPA:
 - After the process completes, a new folder called `skyux-spa-<name-of-root-dir>` where `name-of-root-dir` is what you specified in the first prompt. `cd` into this directory and run `skyux serve`. This opens the SKY UX Host site in your default browser and runs your SPA.
 - As you save changes to your project, the browser reloads your page automatically.
 
-## Available Commands
+## Available commands
 
-- `skyux serve`
-- `skyux build`
-- `skyux help` or `skyux -h`
-- `skyux version` or `skyux -v`
-- `skyux test`
-- `skyux watch`
-- `skyux e2e`
+- `skyux new ` &mdash; Initializes a new SKY UX application.
+- `skyux serve` &mdash; Serves the current SKY UX application.
+- `skyux build` &mdash; Builds the current SKY UX application into dist/.
+- `skyux test` &mdash; Runs unit tests.
+- `skyux e2e` &mdash; Runs end-to-end tests.
+- `skyux watch` &mdash; Runs unit tests and watches the file system for changes.
+- `skyux version` or `skyux -v` &mdash; Returns the version of SKY UX CLI.
+- `skyux help` or `skyux -h` &mdash; Displays help information for SKY UX CLI arguments.
 
-## Available Options
+## Available options
 
-- `-l` or `--launch` &mdash; Specifies which URL to launch when `skyux serve` runs. For example, `skyux serve --launch local` launches the local URL. The available options are `none`, which stops any URL from launching, `local`, and `host`, which launches the host URL and is the default value.
+- `-l` or `--launch` &mdash; Specifies the URL to launch when `skyux serve` runs. For example, `skyux serve --launch local` launches the local URL. The available options are `none`, which stops any URL from launching, `local`, and `host`, which launches the host URL and is the default value.
 
 ## Configuration
 
-In your project's directory, you can use a `skyuxconfig.json` file to configure certain aspects of the SKY UX process.  Some of the values are defined in SKY UX Builder and will not be included in the default `skyuxconfig.json` that comes from running `skyux new`.
+You can use the `skyuxconfig.json` file in your project's directory to configure certain aspects of the SKY UX process. All properties in `skyuxconfig.json` are optional, and by default, the file specifies values for the `mode` and `compileMode` settings. The `skyuxconfig.json` file does not include all configuration options for SKY UX. SKY UX Builder defines some configuration options that are not included.
 
-- `name`: The "name" of your project when running in SKY UX Host.  For example "demo" would mean your SPA is accessible from `https://sky.blackbaud-dev.com/demo`.  This property is optional and by default, this property is read from your `package.json` file.
-- `mode`: Allows you to control how much boilerplate code is automatically generated. This property will eventually become obsolete as the CLI continues to be built, where individual steps are overridable without having to switch completely into advanced mode.  Possible values are `easy` (default) or `advanced`.
-- `compileMode`: Configure ahead-of-time or just-in-time compilation.  Possible values are `aot` (default) or  `jit`.
-- `host`: Configuration options related to communication with SKY UX Host.
-  - `url`: Base URL used when passing information from `skyux serve` to the SKY UX Host.  It would be very uncommon to change this.  Default is `https://sky.blackbaud-dev.com`
-- `app`: Configuration options related to the local app when running `skyux serve`.
-  - `title`: Prior to having Angular2 set the page title, this property is used at the template level to control the title.  Default is `Blackbaud - SKY UX Application`  You can also control the title via the [title service](https://angular.io/docs/ts/latest/cookbook/set-document-title.html).
-- `auth`: Enables your project to require authenticated Blackbaud ID.  Possible values are `false` (default) or `true`.  Checkout the `auth-client` section in helpers to learn about making authenticated http requests.
-- `omnibar`: An object that's passed to Omnibar's `load` method. Learn more about available options for passing to the [Omnibar](http://authsvc.docs.blackbaudhosting.com/components/omnibar/configuration_options/).
-- `help`: Automatically includes the Help Widget in your project.  Possible values are `false` (default) or `true`.
-- `externals`: Use this object to dynamically inject CSS and JS files into the host.  There should be a specific use-case for using an external, such as how Office Addins require their library to be loaded via CDN in the head.  Below is an example showing all the configuration options:
+- `name`: Specifies the "name" of your project when running in SKY UX Host. For example "demo" would mean your SPA is accessible from `https://sky.blackbaud-dev.com/demo`. By default, this property is read from the `package.json` file with "blackbaud-skyux-spa-" removed.
+- `mode`: Allows you to control how much boilerplate code is automatically generated. This property will eventually become obsolete as the CLI continues to be built, where individual steps are overridable without having to switch completely into advanced mode. Possible values are `easy` (default) or `advanced`.
+- `compileMode`: Configures ahead-of-time or just-in-time compilation. Possible values are `aot` (default) or  `jit`.
+- `host`: Specifies configuration options related to communication with SKY UX Host.
+  - `url`: Specifies the base URL used when passing information from `skyux serve` to the SKY UX Host. It would be very uncommon to change this. The default is `https://sky.blackbaud-dev.com`
+- `app`: Specifies configuration options related to the local app when running `skyux serve`.
+  - `title`: Prior to having Angular2 set the page title, this property is used at the template level to control the title. The default is `Blackbaud - SKY UX Application`. You can also control the title via the [title service](https://angular.io/docs/ts/latest/cookbook/set-document-title.html).
+- `auth`: Indicates whether your project requires an authenticated Blackbaud ID. Possible values are `false` (default) or `true`. Check out the `auth-client` section in helpers to learn about making authenticated HTTP requests.
+- `omnibar`: Specifies an object that's passed to Omnibar's `load` method. Learn more about available options for passing to the [Omnibar](http://authsvc.docs.blackbaudhosting.com/components/omnibar/configuration_options/).
+- `help`: Indicates whether to automatically include the Help Widget in your project. Possible values are `false` (default) or `true`.
+- `externals`: Use this object to dynamically inject CSS and JS files into the host. There should be a specific use-case for using an external, such as how Office Addins require their library to be loaded via CDN in the head.  Below is an example showing all the configuration options:
 
 ```
 externals: {
@@ -121,14 +122,14 @@ externals: {
 
 ## Testing
 
-### Unit Testing
+### Unit testing
 
-We automatically configure [Karma](https://karma-runner.github.io) to run unit tests matching the  `*.spec.ts` pattern.  We suggest following the [Angular2 Style Guide](https://angular.io/styleguide#!#naming) regarding what to name your spec files and where to store them.  Checkout the example included in our template via `skyux new` (coming soon) or learn more about [writing unit tests](https://angular.io/docs/ts/latest/testing/) in SKY UX.
+We automatically configure [Karma](https://karma-runner.github.io) to run unit tests matching the `*.spec.ts` pattern. We suggest following the [Angular2 Style Guide](https://angular.io/styleguide#!#naming) regarding what to name your spec files and where to store them. Check out the example included in our template via `skyux new` (coming soon) or learn more about [writing unit tests](https://angular.io/docs/ts/latest/testing/) in SKY UX.
 
-Use `skyux test` to run your tests, or `skyux watch` everytime you make a change to a spec file.
+Use `skyux test` to run your tests, or `skyux watch` every time you make a change to a spec file.
 
-### End-to-End (e2e) Testing
+### End-to-end (e2e) testing
 
-We automatically configure [Protractor](http://www.protractortest.org) to run end-to-end tests matching the `e2e/*.e2e-spec.ts` pattern.  Checkout the example include in our template via `skyux new` (coming soon) or learn more about [writing end-to-end tests](https://angular.io/docs/ts/latest/testing/) in SKY UX.
+We automatically configure [Protractor](http://www.protractortest.org) to run end-to-end tests matching the `e2e/*.e2e-spec.ts` pattern. Check out the example include in our template via `skyux new` (coming soon) or learn more about [writing end-to-end tests](https://angular.io/docs/ts/latest/testing/) in SKY UX.
 
 Use `skyux e2e` to run your tests.
