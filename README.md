@@ -74,7 +74,7 @@ You can use the `skyuxconfig.json` file in your project's directory to configure
   - `url`: Specifies the base URL used when passing information from `skyux serve` to the SKY UX Host. It would be very uncommon to change this. The default is `https://sky.blackbaud-dev.com`
 - `app`: Specifies configuration options related to the local app when running `skyux serve`.
   - `title`: Prior to having Angular2 set the page title, this property is used at the template level to control the title. The default is `Blackbaud - SKY UX Application`. You can also control the title via the [title service](https://angular.io/docs/ts/latest/cookbook/set-document-title.html).
-  - `externals`: Use this object to dynamically inject CSS and JS files into the host. There should be a specific use-case for using an external, such as how Office Addins require their library to be loaded via CDN in the head.  Below is an example showing all the configuration options:
+  - `externals`: Use this object to dynamically inject CSS and JS files into the host. There should be a specific use-case for using an external, such as how Office Addins require their library to be loaded via CDN in the head.  The `before` and `after` sections correspond to whether the external resource is included before or after the default SKY UX Builder resources.  The `head` property is only applicable to JS resources.  Below is an example showing all the configuration options:
 ```
 app: {
   externals: {
