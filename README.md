@@ -74,46 +74,47 @@ You can use the `skyuxconfig.json` file in your project's directory to configure
   - `url`: Specifies the base URL used when passing information from `skyux serve` to the SKY UX Host. It would be very uncommon to change this. The default is `https://sky.blackbaud-dev.com`
 - `app`: Specifies configuration options related to the local app when running `skyux serve`.
   - `title`: Prior to having Angular2 set the page title, this property is used at the template level to control the title. The default is `Blackbaud - SKY UX Application`. You can also control the title via the [title service](https://angular.io/docs/ts/latest/cookbook/set-document-title.html).
-- `auth`: Indicates whether your project requires an authenticated Blackbaud ID. Possible values are `false` (default) or `true`. Check out the `auth-client` section in helpers to learn about making authenticated HTTP requests.
-- `omnibar`: Specifies an object that's passed to Omnibar's `load` method. Learn more about available options for passing to the [Omnibar](http://authsvc.docs.blackbaudhosting.com/components/omnibar/configuration_options/).
-- `help`: Indicates whether to automatically include the Help Widget in your project. Possible values are `false` (default) or `true`.
-- `externals`: Use this object to dynamically inject CSS and JS files into the host. There should be a specific use-case for using an external, such as how Office Addins require their library to be loaded via CDN in the head.  Below is an example showing all the configuration options:
-
+  - `externals`: Use this object to dynamically inject CSS and JS files into the host. There should be a specific use-case for using an external, such as how Office Addins require their library to be loaded via CDN in the head.  Below is an example showing all the configuration options:
 ```
-externals: {
-  css: {
-    before: [
-      {
-        url: 'f1.css',
-        integrity: 'ic1'
-      }
-    ],
-    after: [
-      {
-        url: 'f2.css'
-      }
-    ]
-  },
-  js: {
-    before: [
-      {
-        url: 'f1.js',
-        integrity: 'ic2',
-        head: true
-      },
-      {
-        url: 'f2.js',
-        integrity: 'ic3'
-      }
-    ],
-    after: [
-      {
-        url: 'f3.js'
-      }
-    ]
+app: {
+  externals: {
+    css: {
+      before: [
+        {
+          url: 'f1.css',
+          integrity: 'ic1'
+        }
+      ],
+      after: [
+        {
+          url: 'f2.css'
+        }
+      ]
+    },
+    js: {
+      before: [
+        {
+          url: 'f1.js',
+          integrity: 'ic2',
+          head: true
+        },
+        {
+          url: 'f2.js',
+          integrity: 'ic3'
+        }
+      ],
+      after: [
+        {
+          url: 'f3.js'
+        }
+      ]
+    }
   }
 }
 ```
+- `auth`: Indicates whether your project requires an authenticated Blackbaud ID. Possible values are `false` (default) or `true`. Check out the `auth-client` section in helpers to learn about making authenticated HTTP requests.
+- `omnibar`: Specifies an object that's passed to Omnibar's `load` method. Learn more about available options for passing to the [Omnibar](http://authsvc.docs.blackbaudhosting.com/components/omnibar/configuration_options/).
+- `help`: Indicates whether to automatically include the Help Widget in your project. Possible values are `false` (default) or `true`.
 
 ## Helpers
 
