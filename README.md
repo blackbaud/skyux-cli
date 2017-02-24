@@ -73,8 +73,8 @@ You can use the `skyuxconfig.json` file in your project's directory to configure
 - `host`: Specifies configuration options related to communication with SKY UX Host.
   - `url`: Specifies the base URL used when passing information from `skyux serve` to the SKY UX Host. It would be very uncommon to change this. The default is `https://sky.blackbaud-dev.com`
 - `app`: Specifies configuration options related to the local app when running `skyux serve`.
-  - `title`: Controls the page title. Before Angular2 sets the title, this property controls the tille at the template level. The default title is `Blackbaud - SKY UX Application`. You can also control the title with the [title service](https://angular.io/docs/ts/latest/cookbook/set-document-title.html).
-  - `externals`: Dynamically injects CSS and JS files into the host. You should have a specific use-case for an external. For example, Office Addins require their library to be loaded via CDN in the head. The `before` and `after` sections of an external indicate whether the external resource is included before or after the default SKY UX Builder resources. The `head` property only applies to JS resources. Below is an example with all the configuration options:
+  - `title`: Controls the page title. Before Angular2 sets the title, this property controls the title at the template level. The default title is `Blackbaud - SKY UX Application`. You can also control the title with the [title service](https://angular.io/docs/ts/latest/cookbook/set-document-title.html).
+  - `externals`: Dynamically injects CSS and JS files into the host. You should have a specific use-case for an external. For example, Office Addins require their library to be loaded via CDN in the head. The `before` and `after` sections of an external indicate whether to include the external resource before or after the default SKY UX Builder resources. The `head` property only applies to JS resources. Below is an example with all the configuration options:
 ```
 app: {
   externals: {
