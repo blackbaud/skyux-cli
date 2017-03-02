@@ -19,14 +19,4 @@ For the commands and options available in the SKY UX CLI and reference informati
 
 ## Testing
 
-### Unit testing
-
-We automatically configure [Karma](https://karma-runner.github.io) to run unit tests matching the `*.spec.ts` pattern. We suggest following the [Angular2 Style Guide](https://angular.io/styleguide#!#naming) regarding what to name your spec files and where to store them. Check out the example included in our template via `skyux new` (coming soon) or learn more about [writing unit tests](https://angular.io/docs/ts/latest/testing/) in SKY UX.
-
-Use `skyux test` to run your tests, or `skyux watch` every time you make a change to a spec file.
-
-### End-to-end (e2e) testing
-
-We automatically configure [Protractor](http://www.protractortest.org) to run end-to-end tests matching the `e2e/*.e2e-spec.ts` pattern. Check out the example include in our template via `skyux new` (coming soon) or learn more about [writing end-to-end tests](https://angular.io/docs/ts/latest/testing/) in SKY UX.
-
-Use `skyux e2e` to run your tests.
+For guidance on unit tests and end-to-end tests for SKY UX SPAs, see [the technical reference section of the SKY UX 2 website](https://developer.blackbaud.com/skyux2/learn/reference).
