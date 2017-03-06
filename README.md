@@ -7,7 +7,7 @@ The SKY UX CLI provides a command line interface for the SKY UX Builder. For doc
 
 ## Installation
 
-For guidance on prerequisites and how to install SKY UX CLI, including instructions to install [skyux-ca.crt](https://raw.githubusercontent.com/blackbaud/skyux-builder/master/ssl/skyux-ca.crt) root certificate file, see [the initial setup section of the SKY UX 2 website](https://developer.blackbaud.com/skyux2/learn/tutorials/install).
+For guidance on prerequisites and how to install SKY UX CLI, including instructions to install the [skyux-ca.crt](https://raw.githubusercontent.com/blackbaud/skyux-builder/master/ssl/skyux-ca.crt) root certificate file, see [the initial setup section of the SKY UX 2 website](https://developer.blackbaud.com/skyux2/learn/tutorials/install).
 
 ## Usage
 
