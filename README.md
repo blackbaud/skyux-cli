@@ -114,7 +114,7 @@ app: {
 ```
 - `auth`: Indicates whether your project requires an authenticated Blackbaud ID. Possible values are `false` (default) or `true`. Check out the `auth-client` section in helpers to learn about making authenticated HTTP requests.
 - `omnibar`: Specifies an object that's passed to Omnibar's `load` method. Learn more about available options for passing to the [Omnibar](http://authsvc.docs.blackbaudhosting.com/components/omnibar/configuration_options/).
-- `help`: Indicates whether to automatically include the Help Widget in your project. Possible values are `false` (default) or `true`.
+- `help`: Indicates whether to automatically include the Help Widget in your project. Possible values are `false` (default) or a configuration object. [View Help Widget configuration options.](https://github.com/blackbaud/bb-help#configuration)
 
 ## Helpers
 
