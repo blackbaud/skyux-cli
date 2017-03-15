@@ -39,9 +39,8 @@ describe('skyux new command', () => {
   it('should ask for a spa name and url', (done) => {
     spyOn(fs, 'readJsonSync').and.returnValue({});
     spyOn(fs, 'writeJsonSync');
-
     require('../lib/new')();
-    sendLine('a', () => {
+    sendLine('some-spa-name', () => {
       sendLine('', () => {
         expect(stdout).toContain(
           'What is the root directory for your SPA? (example: my-spa-name)'
@@ -50,6 +49,37 @@ describe('skyux new command', () => {
           'What is the URL to your repo? (leave this blank if you don\'t know)'
         );
         done();
+      });
+    });
+  });
+
+  it('should clone custom template repositories', (done) => {
+    spyOn(logger, 'info');
+    const customTemplateName = 'valid-template-name';
+    const skyuxNew = require('../lib/new')({
+      template: customTemplateName
+    });
+    sendLine('some-spa-name', () => {
+      sendLine('', () => {
+        skyuxNew.then(() => {
+          expect(logger.info).toHaveBeenCalledWith(
+            `${customTemplateName} template successfully cloned.`
+          );
+          done();
+        });
+      });
+    });
+  });
+
+  it('should clone the default template if custom template not provided', (done) => {
+    spyOn(logger, 'info');
+    const skyuxNew = require('../lib/new')();
+    sendLine('some-spa-name', () => {
+      sendLine('', () => {
+        skyuxNew.then(() => {
+          expect(logger.info).toHaveBeenCalledWith('default template successfully cloned.');
+          done();
+        });
       });
     });
   });
@@ -67,23 +97,40 @@ describe('skyux new command', () => {
   it('should catch a spa directory that already exists', (done) => {
     spyOn(fs, 'existsSync').and.returnValue(true);
     require('../lib/new')();
-    sendLine('b', () => {
-      expect(stdout).toContain(
-        'SPA directory already exists.\n'
-      );
+    sendLine('some-spa-name', () => {
+      expect(stdout).toContain('SPA directory already exists.\n');
       done();
     });
   });
 
-  it('should handle an error cloning the template', (done) => {
-    customError = 'CUSTOM-ERROR1';
+  it('should handle an error cloning the default template', (done) => {
+    customError = 'TEMPLATE_ERROR_1';
     spyOn(fs, 'existsSync').and.returnValue(false);
     spyOn(logger, 'error');
-    require('../lib/new')();
-    sendLine('e', () => {
+    const skyuxNew = require('../lib/new')();
+    sendLine('some-spa-name', () => {
       sendLine('', () => {
-        expect(logger.error).toHaveBeenCalledWith('CUSTOM-ERROR1');
-        done();
+        skyuxNew.then(() => {
+          expect(logger.error).toHaveBeenCalledWith('TEMPLATE_ERROR_1');
+          done();
+        });
+      });
+    });
+  });
+
+  it('should handle an error cloning a custom template', (done) => {
+    customError = 'TEMPLATE_ERROR_2';
+    spyOn(fs, 'existsSync').and.returnValue(false);
+    spyOn(logger, 'error');
+    const skyuxNew = require('../lib/new')({
+      template: 'invalid-template-name'
+    });
+    sendLine('some-spa-name', () => {
+      sendLine('', () => {
+        skyuxNew.then(() => {
+          expect(logger.error).toHaveBeenCalledWith('TEMPLATE_ERROR_2');
+          done();
+        });
       });
     });
   });
@@ -92,11 +139,13 @@ describe('skyux new command', () => {
     customError = 'CUSTOM-ERROR2';
     spyOn(fs, 'existsSync').and.returnValue(false);
     spyOn(logger, 'error');
-    require('../lib/new')();
-    sendLine('f', () => {
-      sendLine('g', () => {
-        expect(logger.error).toHaveBeenCalledWith('CUSTOM-ERROR2');
-        done();
+    const skyuxNew = require('../lib/new')();
+    sendLine('some-spa-name', () => {
+      sendLine('some-spa-repo', () => {
+        skyuxNew.then(() => {
+          expect(logger.error).toHaveBeenCalledWith('CUSTOM-ERROR2');
+          done();
+        });
       });
     });
   });
@@ -109,14 +158,16 @@ describe('skyux new command', () => {
       '.gitignore',
       'repo-not-empty'
     ]);
-    spyOn(logger, 'info');
-    require('../lib/new')();
-    sendLine('h', () => {
-      sendLine('i', () => {
-        expect(logger.info).toHaveBeenCalledWith(
-          'skyux new only works with empty repositories.'
-        );
-        done();
+    spyOn(logger, 'error');
+    const skyuxNew = require('../lib/new')();
+    sendLine('some-spa-name', () => {
+      sendLine('some-spa-repo', () => {
+        skyuxNew.then(() => {
+          expect(logger.error).toHaveBeenCalledWith(
+            'skyux new only works with empty repositories.'
+          );
+          done();
+        });
       });
     });
   });
@@ -135,15 +186,17 @@ describe('skyux new command', () => {
       cb();
     });
     spyOn(logger, 'info');
-    require('../lib/new')();
-    sendLine('j', () => {
-      sendLine('k', () => {
-        emitter.emit('exit');
-        expect(logger.info).toHaveBeenCalledWith('Running npm install');
-        expect(logger.info).toHaveBeenCalledWith(
-          'Change into that directory and run "skyux serve" to begin.'
-        );
-        done();
+    const skyuxNew = require('../lib/new')();
+    sendLine('some-spa-name', () => {
+      sendLine('some-spa-repo', () => {
+        skyuxNew.then(() => {
+          emitter.emit('exit');
+          expect(logger.info).toHaveBeenCalledWith('Running npm install');
+          expect(logger.info).toHaveBeenCalledWith(
+            'Change into that directory and run "skyux serve" to begin.'
+          );
+          done();
+        });
       });
     });
   });
