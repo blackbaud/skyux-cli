@@ -182,9 +182,7 @@ describe('skyux new command', () => {
     spyOn(fs, 'readJsonSync').and.returnValue({});
     spyOn(fs, 'writeJsonSync');
     spyOn(fs, 'removeSync');
-    spyOn(fs, 'copy').and.callFake((tmp, path, settings, cb) => {
-      cb();
-    });
+    spyOn(fs, 'copySync');
     spyOn(logger, 'info');
     const skyuxNew = require('../lib/new')();
     sendLine('some-spa-name', () => {
@@ -195,6 +193,26 @@ describe('skyux new command', () => {
           expect(logger.info).toHaveBeenCalledWith(
             'Change into that directory and run "skyux serve" to begin.'
           );
+          done();
+        });
+      });
+    });
+  });
+
+  it('should handle errors when cleaning the template', (done) => {
+    spyOn(fs, 'existsSync').and.returnValue(false);
+    spyOn(fs, 'readdirSync').and.returnValue([
+      '.git',
+      'README.md',
+      '.gitignore'
+    ]);
+    spyOn(fs, 'readJsonSync').and.returnValue({});
+    spyOn(logger, 'info');
+    const skyuxNew = require('../lib/new')();
+    sendLine('some-spa-name', () => {
+      sendLine('some-spa-repo', () => {
+        skyuxNew.then(() => {
+          expect(logger.info).toHaveBeenCalledWith('Template cleanup failed.');
           done();
         });
       });
