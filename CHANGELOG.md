@@ -1,7 +1,3 @@
-# 1.0.0-beta.4 (2017-03-15)
-
-- Added `--template` to `skyux new`.
-
 # 1.0.0-beta.3 (2017-02-17)
 
 - Removed `--noServe` from `skyux help` since it's been deprecated.
