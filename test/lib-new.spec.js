@@ -6,7 +6,8 @@ const promptly = require('promptly');
 const mock = require('mock-require');
 const logger = require('winston');
 const EventEmitter = require('events').EventEmitter;
-const emitter = new EventEmitter();
+
+let emitter;
 
 const sendLine = (line, cb) => {
   setImmediate(() => {
@@ -29,7 +30,11 @@ beforeEach(() => {
   mock('git-clone', (url, path, cb) => {
     cb(customError);
   });
-  mock('cross-spawn', () => emitter);
+  emitter = new EventEmitter();
+  mock('cross-spawn', () => {
+    emitter.emit('spawnCalled');
+    return emitter;
+  });
   customError = null;
   stdout = '';
 });
@@ -199,16 +204,56 @@ describe('skyux new command', () => {
     spyOn(fs, 'removeSync');
     spyOn(fs, 'copySync');
     spyOn(logger, 'info');
+
     const skyuxNew = require('../lib/new')();
+
     sendLine('some-spa-name', () => {
       sendLine('some-spa-repo', () => {
-        skyuxNew.then(() => {
-          emitter.emit('exit');
-          expect(logger.info).toHaveBeenCalledWith('Running npm install');
-          expect(logger.info).toHaveBeenCalledWith(
-            'Change into that directory and run "skyux serve" to begin.'
-          );
-          done();
+        emitter.on('spawnCalled', () => {
+          skyuxNew.then(() => {
+            expect(logger.info).toHaveBeenCalledWith('Running npm install');
+            expect(logger.info).toHaveBeenCalledWith(
+              'Change into that directory and run "skyux serve" to begin.'
+            );
+            done();
+          });
+
+          // Mock npm install success.
+          setImmediate(() => {
+            emitter.emit('exit', 0);
+          });
+        });
+      });
+    });
+  });
+
+  it('should handle errors when running npm install', (done) => {
+    spyOn(fs, 'existsSync').and.returnValue(false);
+    spyOn(fs, 'readdirSync').and.returnValue([
+      '.git',
+      'README.md',
+      '.gitignore'
+    ]);
+    spyOn(fs, 'readJsonSync').and.returnValue({});
+    spyOn(fs, 'writeJsonSync');
+    spyOn(fs, 'removeSync');
+    spyOn(fs, 'copySync');
+    spyOn(logger, 'error');
+
+    const skyuxNew = require('../lib/new')();
+
+    sendLine('some-spa-name', () => {
+      sendLine('some-spa-repo', () => {
+        emitter.on('spawnCalled', () => {
+          skyuxNew.then(() => {
+            expect(logger.error).toHaveBeenCalledWith('npm install failed.');
+            done();
+          });
+
+          // Mock npm install failure.
+          setImmediate(() => {
+            emitter.emit('exit', 1);
+          });
         });
       });
     });
