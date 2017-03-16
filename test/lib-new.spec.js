@@ -71,6 +71,21 @@ describe('skyux new command', () => {
     });
   });
 
+  it('should clone the default template if template flag is used without a name', (done) => {
+    spyOn(logger, 'info');
+    const skyuxNew = require('../lib/new')({
+      template: true
+    });
+    sendLine('some-spa-name', () => {
+      sendLine('', () => {
+        skyuxNew.then(() => {
+          expect(logger.info).toHaveBeenCalledWith('default template successfully cloned.');
+          done();
+        });
+      });
+    });
+  });
+
   it('should clone the default template if custom template not provided', (done) => {
     spyOn(logger, 'info');
     const skyuxNew = require('../lib/new')();
@@ -123,7 +138,7 @@ describe('skyux new command', () => {
     spyOn(fs, 'existsSync').and.returnValue(false);
     spyOn(logger, 'error');
     const skyuxNew = require('../lib/new')({
-      template: 'invalid-template-name'
+      t: 'invalid-template-name'
     });
     sendLine('some-spa-name', () => {
       sendLine('', () => {
