@@ -1,3 +1,7 @@
+# 1.0.0-beta.4 (2017-03-17)
+
+- Allowing changing of the default template to be cloned via `--template` or `-t` when running `skyux new`.  See help for more information.  Thanks @Blackbaud-SteveBrush!
+
 # 1.0.0-beta.3 (2017-02-17)
 
 - Removed `--noServe` from `skyux help` since it's been deprecated.
