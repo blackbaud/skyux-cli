@@ -1,3 +1,7 @@
+# 1.0.0-beta.5 (2017-05-12)
+
+- Automatically installing the latest version of `@blackbaud/skyux` and `@blackbaud/skyux-builder` when running `skyux new` command.
+
 # 1.0.0-beta.4 (2017-03-17)
 
 - Allowed changing of the default template to be cloned via `--template` or `-t` when running `skyux new`.  See help for more information.  Thanks @Blackbaud-SteveBrush!
