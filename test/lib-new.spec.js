@@ -31,8 +31,8 @@ beforeEach(() => {
     cb(customError);
   });
   emitter = new EventEmitter();
-  mock('cross-spawn', () => {
-    emitter.emit('spawnCalled');
+  mock('cross-spawn', (cmd, args) => {
+    emitter.emit('spawnCalled', cmd, args);
     return emitter;
   });
   customError = null;
@@ -40,6 +40,11 @@ beforeEach(() => {
 });
 
 describe('skyux new command', () => {
+  const expectedNpmSpawnArgs = [
+    ['install'],
+    ['install', '@blackbaud/skyux@latest', '--save', '--save-exact'],
+    ['install', '@blackbaud/skyux-builder@latest', '--save-dev', '--save-exact']
+  ];
 
   it('should ask for a spa name and url', (done) => {
     spyOn(fs, 'readJsonSync').and.returnValue({});
@@ -274,6 +279,44 @@ describe('skyux new command', () => {
         skyuxNew.then(() => {
           expect(logger.info).toHaveBeenCalledWith('Template cleanup failed.');
           done();
+        });
+      });
+    });
+  });
+
+  it('should install the latest versions of SKY UX and SKY UX Builder', (done) => {
+    spyOn(fs, 'existsSync').and.returnValue(false);
+    spyOn(fs, 'readdirSync').and.returnValue([
+      '.git',
+      'README.md',
+      '.gitignore'
+    ]);
+    spyOn(fs, 'readJsonSync').and.returnValue({});
+    spyOn(fs, 'writeJsonSync');
+    spyOn(fs, 'removeSync');
+    spyOn(fs, 'copySync');
+    spyOn(logger, 'error');
+
+    const skyuxNew = require('../lib/new')();
+
+    let spawnCallIndex = -1;
+
+    sendLine('some-spa-name', () => {
+      sendLine('some-spa-repo', () => {
+        emitter.on('spawnCalled', (cmd, args) => {
+          spawnCallIndex++;
+          expect(args).toEqual(expectedNpmSpawnArgs[spawnCallIndex]);
+
+          if (spawnCallIndex === expectedNpmSpawnArgs.length - 1) {
+            skyuxNew.then(() => {
+              done();
+            });
+          }
+
+          // Mock npm install success.
+          setImmediate(() => {
+            emitter.emit('exit', 0);
+          });
         });
       });
     });
