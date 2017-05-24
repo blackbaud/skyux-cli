@@ -7,16 +7,16 @@ The SKY UX CLI provides a command line interface for the SKY UX Builder. For doc
 
 ## Installation
 
-For guidance on prerequisites and how to install SKY UX CLI, including instructions to install the [skyux-ca.crt](https://raw.githubusercontent.com/blackbaud/skyux-builder/master/ssl/skyux-ca.crt) root certificate file, see [the initial setup section of the SKY UX 2 website](https://developer.blackbaud.com/skyux2/learn/tutorials/install).
+For guidance on prerequisites and how to install SKY UX CLI, including instructions to install the [skyux-ca.crt](https://raw.githubusercontent.com/blackbaud/skyux-builder/master/ssl/skyux-ca.crt) root certificate file, see [the initial setup section of the SKY UX 2 website](https://developer.blackbaud.com/skyux2/learn/get-started/2.-initial-setup).
 
 ## Usage
 
-For guidance on how to create and edit a SKY UX SPA, see [the getting started tutorials on the SKY UX 2 website](https://developer.blackbaud.com/skyux2/learn/tutorials).
+For guidance on how to create and edit a SKY UX SPA, see [the getting started tutorials on the SKY UX 2 website](https://developer.blackbaud.com/skyux2/learn/get-started).
 
 ## CLI commands and SPA configuration options
 
-For the commands and options available in the SKY UX CLI and reference information such as configuration options for SKY UX SPAs, see [the technical reference section of the SKY UX 2 website](https://developer.blackbaud.com/skyux2/learn/reference).
+For the commands and options available in the SKY UX CLI and reference information such as configuration options for SKY UX SPAs, see [the technical reference section of the SKY UX 2 website](https://developer.blackbaud.com/skyux2/learn/reference/cli-commands).
 
 ## Testing
 
-For guidance on unit tests and end-to-end tests for SKY UX SPAs, see [the technical reference section of the SKY UX 2 website](https://developer.blackbaud.com/skyux2/learn/reference).
+For guidance on unit tests and end-to-end tests for SKY UX SPAs, see [the technical reference section of the SKY UX 2 website](https://developer.blackbaud.com/skyux2/learn/reference/tests).
