@@ -1,6 +1,7 @@
-# 1.0.0-beta.5 (2017-05-12)
+# 1.0.0-beta.5 (2017-05-25)
 
 - Automatically installing the latest version of `@blackbaud/skyux` and `@blackbaud/skyux-builder` when running `skyux new` command.
+- Automatically switching to `feature-newproject` branch when running `skyux new` and specifying a repo url.
 
 # 1.0.0-beta.4 (2017-03-17)
 
