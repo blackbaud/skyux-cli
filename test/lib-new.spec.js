@@ -257,9 +257,9 @@ describe('skyux new command', () => {
       sendLine('some-spa-name', () => {
         emitter.on('spawnCalled', () => {
           skyuxNew.then(() => {
-            expect(logger.info).toHaveBeenCalledWith('Switching to branch feature-new-project.');
+            expect(logger.info).toHaveBeenCalledWith('Switching to branch initial-commit.');
             expect(logger.error).toHaveBeenCalledWith(
-              'Switching to branch feature-newproject failed.'
+              'Switching to branch initial-commit failed.'
             );
             done();
           });
