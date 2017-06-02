@@ -211,21 +211,62 @@ describe('skyux new command', () => {
     spyOn(logger, 'info');
 
     const skyuxNew = require('../lib/new')();
+    let spawnCalledCount = 0;
 
     sendLine('some-spa-name', () => {
       sendLine('some-spa-repo', () => {
         emitter.on('spawnCalled', () => {
+
+          if (spawnCalledCount === 3) {
+            skyuxNew.then(() => {
+              expect(logger.info).toHaveBeenCalledWith('Running npm install');
+              expect(logger.info).toHaveBeenCalledWith(
+                'Change into that directory and run "skyux serve" to begin.'
+              );
+              done();
+            });
+          }
+
+          // Mock git checkout and npm install (x3) success.
+          setImmediate(() => {
+            spawnCalledCount++;
+            emitter.emit('exit', 0);
+          });
+        });
+      });
+    });
+  });
+
+  it('should handle errors when running git checkout', (done) => {
+    spyOn(fs, 'existsSync').and.returnValue(false);
+    spyOn(fs, 'readdirSync').and.returnValue([
+      '.git',
+      'README.md',
+      '.gitignore'
+    ]);
+    spyOn(fs, 'readJsonSync').and.returnValue({});
+    spyOn(fs, 'writeJsonSync');
+    spyOn(fs, 'removeSync');
+    spyOn(fs, 'copySync');
+    spyOn(logger, 'info');
+    spyOn(logger, 'error');
+
+    const skyuxNew = require('../lib/new')();
+
+    sendLine('some-spa-name', () => {
+      sendLine('some-spa-name', () => {
+        emitter.on('spawnCalled', () => {
           skyuxNew.then(() => {
-            expect(logger.info).toHaveBeenCalledWith('Running npm install');
-            expect(logger.info).toHaveBeenCalledWith(
-              'Change into that directory and run "skyux serve" to begin.'
+            expect(logger.info).toHaveBeenCalledWith('Switching to branch initial-commit.');
+            expect(logger.error).toHaveBeenCalledWith(
+              'Switching to branch initial-commit failed.'
             );
             done();
           });
 
-          // Mock npm install success.
+          // Mock git checkout error
           setImmediate(() => {
-            emitter.emit('exit', 0);
+            emitter.emit('exit', 1);
           });
         });
       });
@@ -248,7 +289,9 @@ describe('skyux new command', () => {
     const skyuxNew = require('../lib/new')();
 
     sendLine('some-spa-name', () => {
-      sendLine('some-spa-repo', () => {
+
+      // Don't provide current repo URL to clone
+      sendLine('', () => {
         emitter.on('spawnCalled', () => {
           skyuxNew.then(() => {
             expect(logger.error).toHaveBeenCalledWith('npm install failed.');
@@ -302,7 +345,9 @@ describe('skyux new command', () => {
     let spawnCallIndex = -1;
 
     sendLine('some-spa-name', () => {
-      sendLine('some-spa-repo', () => {
+
+      // Don't provide current repo URL to clone
+      sendLine('', () => {
         emitter.on('spawnCalled', (cmd, args) => {
           spawnCallIndex++;
           expect(args).toEqual(expectedNpmSpawnArgs[spawnCallIndex]);
