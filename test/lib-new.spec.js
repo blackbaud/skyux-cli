@@ -255,8 +255,14 @@ describe('skyux new command', () => {
 
     sendLine('some-spa-name', () => {
       sendLine('some-spa-name', () => {
-        emitter.on('spawnCalled', () => {
+        emitter.on('spawnCalled', (command, args) => {
           skyuxNew.then(() => {
+            expect(command).toEqual('git');
+            expect(args).toEqual([
+              'checkout',
+              '-b',
+              'initial-commit'
+            ]);
             expect(logger.info).toHaveBeenCalledWith('Switching to branch initial-commit.');
             expect(logger.error).toHaveBeenCalledWith(
               'Switching to branch initial-commit failed.'
