@@ -1,3 +1,7 @@
+# 1.0.0-beta.6 (2017-07-14)
+
+- Fixed typo in branch name when running `skyux new`. [#120](https://github.com/blackbaud/skyux-cli/pull/120)
+
 # 1.0.0-beta.5 (2017-06-02)
 
 - Automatically installing the latest version of `@blackbaud/skyux` and `@blackbaud/skyux-builder` when running `skyux new` command.
