@@ -1,4 +1,4 @@
-# Logs
+﻿# Logs
 logs
 *.log
 npm-debug.log*
@@ -13,6 +13,9 @@ lib-cov
 
 # Coverage directory used by tools like istanbul
 coverage
+
+# Test results directory used by tools like jasmine JUnit reporter
+testresults
 
 # nyc test coverage
 .nyc_output
@@ -37,3 +40,6 @@ jspm_packages
 .node_repl_history
 
 .DS_Store
+
+# Visual Studio
+.vs
