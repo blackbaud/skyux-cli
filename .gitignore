@@ -14,6 +14,9 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 
+# Test results directory used by tools like jasmine JUnit reporter
+testresults
+
 # nyc test coverage
 .nyc_output
 
