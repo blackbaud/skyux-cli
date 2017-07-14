@@ -8,7 +8,7 @@
     "skyux": "bin/skyux.js"
   },
   "scripts": {
-    "coverage": "istanbul cover --report=cobertura --report=html jasmine JASMINE_CONFIG_PATH=jasmine.json",
+    "coverage": "istanbul cover --report=cobertura --report=html node_modules/jasmine/bin/jasmine.js -- JASMINE_CONFIG_PATH=jasmine.json",
     "jscs": "jscs bin lib",
     "jshint": "jshint bin lib",
     "lint": "npm run jshint && npm run jscs",
