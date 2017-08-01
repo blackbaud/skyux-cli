@@ -41,6 +41,7 @@ beforeEach(() => {
 
 describe('skyux new command', () => {
   const expectedNpmSpawnArgs = [
+    ['use'],
     ['install'],
     ['install', '@blackbaud/skyux@latest', '--save', '--save-exact'],
     ['install', '@blackbaud/skyux-builder@latest', '--save-dev', '--save-exact']
@@ -294,7 +295,7 @@ describe('skyux new command', () => {
       sendLine('', () => {
         emitter.on('spawnCalled', () => {
           skyuxNew.then(() => {
-            expect(logger.error).toHaveBeenCalledWith('npm install failed.');
+            expect(logger.error).toHaveBeenCalledWith('nvm use failed.');
             done();
           });
 
