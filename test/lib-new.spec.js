@@ -91,7 +91,7 @@ describe('skyux new command', () => {
       sendLine('', () => {
         skyuxNew.then(() => {
           expect(logger.info).toHaveBeenCalledWith(
-            `Creating new SPA named 'skyux-lib-some-spa-name'.`
+            `Creating a new SPA named 'skyux-lib-some-spa-name'.`
           );
           done();
         });
