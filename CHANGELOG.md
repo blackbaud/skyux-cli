@@ -1,6 +1,7 @@
 # 1.0.0-beta.7 (2017-08-17)
 
 - Updated package dependencies. [#124](https://github.com/blackbaud/skyux-cli/pull/124)
+- Component libraries created using `skyux new -t library` are given a package name with prefix `skyux-lib-*`. [#123](https://github.com/blackbaud/skyux-cli/pull/123)
 
 # 1.0.0-beta.6 (2017-07-14)
 
