@@ -81,6 +81,24 @@ describe('skyux new command', () => {
     });
   });
 
+  it('should name the package with a specific prefix depending on the template', (done) => {
+    spyOn(logger, 'info');
+    const libTemplateName = 'library';
+    const skyuxNew = require('../lib/new')({
+      template: libTemplateName
+    });
+    sendLine('some-spa-name', () => {
+      sendLine('', () => {
+        skyuxNew.then(() => {
+          expect(logger.info).toHaveBeenCalledWith(
+            `Creating a new SPA named 'skyux-lib-some-spa-name'.`
+          );
+          done();
+        });
+      });
+    });
+  });
+
   it('should clone the default template if template flag is used without a name', (done) => {
     spyOn(logger, 'info');
     const skyuxNew = require('../lib/new')({
