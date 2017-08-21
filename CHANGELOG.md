@@ -1,3 +1,7 @@
+# 1.0.0-rc.0 (2017-08-21)
+
+- Fixed formatting of `package.json` when running `skyux new`. [#126](https://github.com/blackbaud/skyux-cli/pull/126)
+
 # 1.0.0-beta.7 (2017-08-17)
 
 - Updated package dependencies. [#124](https://github.com/blackbaud/skyux-cli/pull/124)
