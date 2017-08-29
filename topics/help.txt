@@ -1,0 +1,10 @@
+new             Initializes a new SKY UX application.
+serve           Serves the current SKY UX application.
+build           Builds the current SKY UX application into dist/.
+test            Runs unit tests.
+e2e             Runs end-to-end tests.
+watch           Runs unit tests and watches the file system for changes.
+version         Returns the version of SKY UX CLI.
+help            Displays help information for SKY UX CLI arguments.
+
+Use skyux help [command] to learn more about specific commands.
