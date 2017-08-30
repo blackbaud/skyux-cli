@@ -1,10 +1,12 @@
-new             Initializes a new SKY UX application.
-serve           Serves the current SKY UX application.
-build           Builds the current SKY UX application into dist/.
-test            Runs unit tests.
-e2e             Runs end-to-end tests.
-watch           Runs unit tests and watches the file system for changes.
+build           Builds the current SPA into the dist/ folder.
+build-public-library           Bundles components into an NPM module.
+e2e             Runs any end-to-end tests in the e2e folder.
+help            Displays help for SKY UX CLI arguments.
+lint            Validates Typescript code against rules.
+new             Initializes a new local SKY UX application.
+serve           Serves the current application locally.
+test            Runs any unit tests in the src/app folder.
 version         Returns the version of SKY UX CLI.
-help            Displays help information for SKY UX CLI arguments.
+watch           Runs unit tests and watches the file system for changes.
 
-Use skyux help [command] to learn more about specific commands.
+To learn more about specific commands, enter "skyux help [command]" in the command prompt or go to https://developer.blackbaud.com/skyux2/learn/reference/cli-commands.

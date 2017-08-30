@@ -1,1 +1,1 @@
-Build help file.
+The "skyux build" command builds the current SPA into the dist/ folder. The "build" and "serve" commands are largely the same command under the hood, but "serve" works in memory and launches a web server for the user, while "build" performs the same operations by writing and storing files to disk. It also produces the static assets for an SPA. For more information about "skyux build," see https://developer.blackbaud.com/skyux2/learn/reference/cli-commands/build.

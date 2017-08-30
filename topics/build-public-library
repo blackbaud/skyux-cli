@@ -1,0 +1,1 @@
+The "skyux build-public-library" command bundles custom Angular components into a consumable NPM module that can be published to an NPM stream such as npmjs.org so that other SPAs can install it. For more information about "skyux build-public-library," see https://developer.blackbaud.com/skyux2/learn/reference/cli-commands/build-public-library.

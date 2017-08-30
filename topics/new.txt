@@ -1,0 +1,1 @@
+The "skyux new" command initializes a new local SKY UX project by pulling down the latest version of the template and installing the necessary dependencies. For more information about "skyux new," see https://developer.blackbaud.com/skyux2/learn/reference/cli-commands/new.
