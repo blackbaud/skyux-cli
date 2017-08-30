@@ -1,12 +1,29 @@
-build           Builds the current SPA into the dist/ folder.
-build-public-library           Bundles components into an NPM module.
-e2e             Runs any end-to-end tests in the e2e folder.
-help            Displays help for SKY UX CLI arguments.
-lint            Validates Typescript code against rules.
-new             Initializes a new local SKY UX application.
-serve           Serves the current application locally.
-test            Runs any unit tests in the src/app folder.
-version         Returns the version of SKY UX CLI.
-watch           Runs unit tests and watches the file system for changes.
+build
+  Builds the current SPA into the dist/ folder.
 
-To learn more about specific commands, enter "skyux help [command]" in the command prompt or go to https://developer.blackbaud.com/skyux2/learn/reference/cli-commands.
+build-public-library
+  Bundles components into an NPM module.
+
+e2e
+  Runs any end-to-end tests in the e2e folder.
+
+help
+  Displays help for SKY UX CLI arguments.
+
+lint
+  Validates Typescript code against rules.
+
+new
+  Initializes a new local SKY UX application.
+
+serve
+  Serves the current application locally.
+
+test
+  Runs any unit tests in the src/app folder.
+
+version
+  Returns the version of SKY UX CLI.
+
+watch
+  Runs unit tests and watches the file system for changes.
