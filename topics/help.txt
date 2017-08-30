@@ -11,7 +11,7 @@ help
   Displays help for SKY UX CLI arguments.
 
 lint
-  Validates Typescript code against rules.
+  Validates Typescript code against rules in tslint.json.
 
 new
   Initializes a new local SKY UX application.
