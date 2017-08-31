@@ -1,3 +1,7 @@
+# 1.0.0-rc.1 (2017-09-01)
+
+- Updated `skyux help` messaging and functionality.  Use `skyux help [command]` to learn more about a specific command. [#128](https://github.com/blackbaud/skyux-cli/pull/128)
+
 # 1.0.0-rc.0 (2017-08-21)
 
 - Fixed formatting of `package.json` when running `skyux new`. [#126](https://github.com/blackbaud/skyux-cli/pull/126)
