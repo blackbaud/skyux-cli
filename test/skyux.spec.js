@@ -9,6 +9,18 @@ const logger = require('winston');
 
 describe('skyux CLI', () => {
 
+  let spyProcessExit;
+  let spyLoggerError;
+  let spyLoggerWarn
+  let spyLoggerInfo;
+
+  beforeEach(() => {
+    spyProcessExit = spyOn(process, 'exit');
+    spyLoggerError = spyOn(logger, 'error');
+    spyLoggerWarn = spyOn(logger, 'warn');
+    spyLoggerInfo = spyOn(logger, 'info');
+  });
+
   it('should accept known command version', () => {
     let called = false;
     mock('../lib/version', {
@@ -70,7 +82,6 @@ describe('skyux CLI', () => {
 
   it('should pass version command to devDependencies', () => {
     let called = false;
-    spyOn(logger, 'info');
     spyOn(fs, 'existsSync').and.returnValue(false);
     mock('../lib/version', {
       logVersion: () => {
@@ -81,21 +92,10 @@ describe('skyux CLI', () => {
     const cli = require('../index');
     cli({ _: ['version'] });
     expect(called).toEqual(true);
-    expect(logger.info).toHaveBeenCalledWith('No package.json file found in current working directory.');
-  });
-
-  it('should pass unknown command to devDependencies', () => {
-    spyOn(logger, 'info');
-    spyOn(fs, 'existsSync').and.returnValue(false);
-
-    const cli = require('../index');
-    cli({ _: ['test'] });
-    expect(logger.info).toHaveBeenCalledTimes(2);
   });
 
   it('should not pass new command to devDependencies', () => {
     let called = false;
-    spyOn(logger, 'info');
     spyOn(fs, 'existsSync').and.returnValue(false);
     mock('../lib/new', () => {
       called = true;
@@ -104,28 +104,26 @@ describe('skyux CLI', () => {
     const cli = require('../index');
     cli({ _: ['new'] });
     expect(called).toEqual(true);
-    expect(logger.info).not.toHaveBeenCalled();
+    expect(spyLoggerInfo).not.toHaveBeenCalled();
   });
 
   it('should accept unknown command', () => {
-    spyOn(logger, 'info');
-
     const cli = require('../index');
     cli({ _: ['test'] });
-    expect(logger.info).toHaveBeenCalled();
+    expect(spyLoggerInfo).toHaveBeenCalled();
   });
 
   it('should work if package.json does not exist', () => {
-    spyOn(logger, 'info');
     spyOn(fs, 'existsSync').and.returnValue(false);
 
     const cli = require('../index');
     cli({ _: ['test'] });
-    expect(logger.info).toHaveBeenCalled();
+    expect(spyProcessExit).toHaveBeenCalledWith(1);
+    expect(spyLoggerError)
+      .toHaveBeenCalledWith('No package.json file found in current working directory.');
   });
 
-  it('should work if package.json exists without devDependencies', () => {
-    spyOn(logger, 'info');
+  it('should work if package.json exists without devDependencies property', () => {
     spyOn(fs, 'existsSync').and.returnValue(true);
 
     let stubs = {};
@@ -135,11 +133,26 @@ describe('skyux CLI', () => {
 
     const cli = proxyquire('../index', stubs);
     cli({ _: ['test'] });
-    expect(logger.info).toHaveBeenCalled();
+    expect(spyProcessExit).toHaveBeenCalledWith(1);
+    expect(spyLoggerError).toHaveBeenCalledWith('package.json contains no devDependencies');
+  });
+
+  it('should work if package.json exists without matching devDependencies', () => {
+    spyOn(fs, 'existsSync').and.returnValue(true);
+
+    let stubs = {};
+    stubs[path.join(process.cwd(), 'package.json')] = {
+      '@noCallThru': true,
+      devDependencies: {}
+    };
+
+    const cli = proxyquire('../index', stubs);
+    cli({ _: ['test'] });
+    expect(spyProcessExit).toHaveBeenCalledWith(1);
+    expect(spyLoggerError).toHaveBeenCalledWith('Your package.json contains no matching dependencies');
   });
 
   it('should work if package.json exists with matching devDependencies', () => {
-    spyOn(logger, 'warn');
     spyOn(fs, 'existsSync').and.returnValue(true);
 
     let stubs = {};
@@ -160,13 +173,43 @@ describe('skyux CLI', () => {
       '@noCallThru': true,
       runCommand: () => {
         called = true;
+        return true;
       }
     };
 
     const cli = proxyquire('../index', stubs);
     cli({ _: ['test'] });
-    expect(logger.warn).toHaveBeenCalled();
+    expect(spyLoggerWarn.calls.mostRecent().args[0]).toEqual(
+      'Found matching module without exposed runCommand - %s'
+    );
     expect(called).toEqual(true);
+  });
+
+  it('should not log unknown command if any runCommand returns true', () => {
+    spyOn(fs, 'existsSync').and.returnValue(true);
+
+    let stubs = {};
+    let called = false;
+    stubs[path.join(process.cwd(), 'package.json')] = {
+      '@noCallThru': true,
+      devDependencies: {
+        'blackbaud-skyux-builder-test1': '0.0.1'
+      }
+    };
+
+    stubs[path.join(process.cwd(), 'node_modules', 'blackbaud-skyux-builder-test1')] = {
+      '@noCallThru': true,
+      runCommand: () => {
+        called = true;
+        return false;
+      }
+    };
+
+    const cli = proxyquire('../index', stubs);
+    cli({ _: ['test'] });
+    expect(called).toEqual(true);
+    expect(spyProcessExit).toHaveBeenCalledWith(1);
+    expect(spyLoggerError.calls.mostRecent().args[0]).toEqual('Unknown command.');
   });
 
 });

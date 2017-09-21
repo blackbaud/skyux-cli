@@ -20,8 +20,13 @@ function getModules(packageJson) {
         modules.push(require(path.join(process.cwd(), 'node_modules', d)));
       }
     }
+
+    if (modules.length === 0) {
+      fatal(`Your package.json contains no matching dependencies`);
+    }
+
   } else {
-    logger.info('package.json contains no devDependencies');
+    fatal('package.json contains no devDependencies');
   }
 
   return modules;
@@ -34,13 +39,51 @@ function getModules(packageJson) {
  * @returns null
  */
 function runCommand(modules, command, argv) {
+  let answered = false;
+
   modules.forEach((module) => {
     if (typeof module.runCommand === 'function') {
-      module.runCommand(command, argv);
+      if (module.runCommand(command, argv)) {
+        answered = true;
+      }
     } else {
       logger.warn('Found matching module without exposed runCommand - %s', module);
     }
   });
+
+  return answered;
+}
+
+/**
+ * Invokes any matching modules.
+ * @param {string} command
+ * @param {object} argv
+ * @param {boolean} displayError
+ * @returns null
+ */
+function invokeModules(command, argv, displayError) {
+  const packageJsonPath = path.join(process.cwd(), 'package.json');
+
+  if (fs.existsSync(packageJsonPath)) {
+    const modules = getModules(require(packageJsonPath));
+    const answered = runCommand(modules, command, argv);
+
+    if (!answered && displayError) {
+      fatal('Unknown command.');
+    }
+
+  } else if (displayError) {
+    fatal('No package.json file found in current working directory.');
+  }
+}
+
+/**
+ * Display an error message and set the exit code.
+ * @param {string} msg
+ */
+function fatal(msg) {
+  logger.error(msg);
+  process.exit(1);
 }
 
 /**
@@ -50,9 +93,8 @@ function runCommand(modules, command, argv) {
  * @param [Object] argv
  */
 function processArgv(argv) {
-  const packageJsonPath = path.join(process.cwd(), 'package.json');
+
   let command = argv._[0];
-  let passToModules = true;
 
   // Allow shorthand "-v" for version
   if (argv.v) {
@@ -64,33 +106,26 @@ function processArgv(argv) {
     command = 'help';
   }
 
+  // Help and version commands are answered here AND passed through
+  // They won't however cause errors if unanswered.
   switch (command) {
     case 'version':
       require('./lib/version').logVersion(argv);
+      invokeModules(command, argv, false);
       break;
     case 'new':
       require('./lib/new')(argv);
-      passToModules = false;
       break;
     case 'help':
     case undefined:
       require('./lib/help')(argv);
+      invokeModules(command, argv, false);
       break;
     default:
       logger.info('SKY UX processing command %s', command);
+      invokeModules(command, argv, true);
       break;
   }
-
-  // CLI handles new command without passing through to modules
-  if (passToModules) {
-    if (fs.existsSync(packageJsonPath)) {
-      const modules = getModules(require(packageJsonPath));
-      runCommand(modules, command, argv);
-    } else {
-      logger.info('No package.json file found in current working directory.');
-    }
-  }
-
 }
 
 module.exports = processArgv;
