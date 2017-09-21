@@ -5,6 +5,7 @@ const fs = require('fs-extra');
 const promptly = require('promptly');
 const mock = require('mock-require');
 const logger = require('winston');
+const latestVersion = require('latest-version');
 const EventEmitter = require('events').EventEmitter;
 
 let emitter;
@@ -18,6 +19,7 @@ const sendLine = (line, cb) => {
 
 let stdout = null;
 let customError = '';
+let versionsRequested;
 
 const oldWrite = process.stdout.write;
 process.stdout.write = function (data) {
@@ -30,21 +32,24 @@ beforeEach(() => {
   mock('git-clone', (url, path, cb) => {
     cb(customError);
   });
+
   emitter = new EventEmitter();
   mock('cross-spawn', (cmd, args) => {
     emitter.emit('spawnCalled', cmd, args);
     return emitter;
   });
+
+  versionsRequested = {};
+  mock('latest-version', (dep) => {
+    versionsRequested[dep] = true;
+    return Promise.resolve(`${dep}-LATEST`);
+  });
+
   customError = null;
   stdout = '';
 });
 
 describe('skyux new command', () => {
-  const expectedNpmSpawnArgs = [
-    ['install'],
-    ['install', '@blackbaud/skyux@latest', '--save', '--save-exact'],
-    ['install', '@blackbaud/skyux-builder@latest', '--save-dev', '--save-exact']
-  ];
 
   it('should ask for a spa name and url', (done) => {
     spyOn(fs, 'readJsonSync').and.returnValue({});
@@ -235,7 +240,7 @@ describe('skyux new command', () => {
       sendLine('some-spa-repo', () => {
         emitter.on('spawnCalled', () => {
 
-          if (spawnCalledCount === 3) {
+          if (spawnCalledCount === 1) {
             skyuxNew.then(() => {
               expect(logger.info).toHaveBeenCalledWith('Running npm install');
               expect(logger.info).toHaveBeenCalledWith(
@@ -358,34 +363,33 @@ describe('skyux new command', () => {
       'README.md',
       '.gitignore'
     ]);
-    spyOn(fs, 'readJsonSync').and.returnValue({});
-    spyOn(fs, 'writeJsonSync');
+    spyOn(fs, 'readJsonSync').and.returnValue({
+      dependencies: {},
+      devDependencies: {}
+    });
+    let spyWriteJson = spyOn(fs, 'writeJsonSync');
     spyOn(fs, 'removeSync');
     spyOn(fs, 'copySync');
     spyOn(logger, 'error');
 
-    const skyuxNew = require('../lib/new')();
+    require('../lib/new')();
 
-    let spawnCallIndex = -1;
-
+    // Don't provide current repo URL to clone
     sendLine('some-spa-name', () => {
-
-      // Don't provide current repo URL to clone
       sendLine('', () => {
-        emitter.on('spawnCalled', (cmd, args) => {
-          spawnCallIndex++;
-          expect(args).toEqual(expectedNpmSpawnArgs[spawnCallIndex]);
+        emitter.on('spawnCalled', () => {
+          const json = spyWriteJson.calls.mostRecent().args[1];
+          const deps = {
+            '@blackbaud/skyux': 'dependencies',
+            '@blackbaud/skyux-builder': 'devDependencies'
+          };
 
-          if (spawnCallIndex === expectedNpmSpawnArgs.length - 1) {
-            skyuxNew.then(() => {
-              done();
-            });
-          }
-
-          // Mock npm install success.
-          setImmediate(() => {
-            emitter.emit('exit', 0);
+          Object.keys(deps).forEach(key => {
+            expect(json[deps[key]][key]).toBe(`${key}-LATEST`);
+            expect(versionsRequested[key]).toBe(true);
           });
+
+          done();
         });
       });
     });

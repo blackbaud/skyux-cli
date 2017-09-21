@@ -32,6 +32,7 @@
     "cross-spawn": "5.1.0",
     "fs-extra": "4.0.1",
     "git-clone": "0.1.0",
+    "latest-version": "3.1.0",
     "minimist": "1.2.0",
     "open": "0.0.5",
     "promptly": "2.2.0",
