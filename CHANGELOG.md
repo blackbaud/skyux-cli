@@ -1,6 +1,6 @@
 # 1.0.0-rc.1 (2017-09-14)
 
-- Determing the latest versions of `@blackbaud/skyux` and `@blackbaud/skyux-builder` before `npm install` step of `skyux new`. [#130](https://github.com/blackbaud/skyux-cli/pull/130)
+- Determining the latest versions of `@blackbaud/skyux` and `@blackbaud/skyux-builder` before the `npm install` step of `skyux new`. [#130](https://github.com/blackbaud/skyux-cli/pull/130)
 
 # 1.0.0-rc.1 (2017-09-14)
 
