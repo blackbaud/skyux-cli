@@ -1,46 +1,23 @@
 /*jshint node: true*/
 'use strict';
 
-const fs = require('fs');
 const path = require('path');
+const glob = require('glob');
 const logger = require('winston');
 
 /**
- * Iterates object's devDependencies to find applicable modules.
- * @name getModules
- * @returns [module[]] modules
+ * Returns results of glob.sync from specified directory and our glob pattern.
+ * @param {string} dir
+ * @returns {Array} Array of matching patterns
  */
-function getModules(packageJson) {
-  let modules = [];
+function getGlobs(dirs) {
+  let globs = [];
 
-  if (packageJson.devDependencies) {
-    for (let d in packageJson.devDependencies) {
-      /* istanbul ignore else */
-      if (/(.*)skyux-builder(.*)/gi.test(d)) {
-        modules.push(require(path.join(process.cwd(), 'node_modules', d)));
-      }
-    }
-  } else {
-    logger.info('package.json contains no devDependencies');
-  }
-
-  return modules;
-}
-
-/**
- * Iterates an array of modules.
- * Executes the requested method if it exists.
- * @name runCommand
- * @returns null
- */
-function runCommand(modules, command, argv) {
-  modules.forEach((module) => {
-    if (typeof module.runCommand === 'function') {
-      module.runCommand(command, argv);
-    } else {
-      logger.warn('Found matching module without exposed runCommand - %s', module);
-    }
+  dirs.forEach(dir => {
+    globs = globs.concat(glob.sync(path.resolve(dir, '/node_modules/**/*skyux-builder*/**/package.json')));
   });
+
+  return globs;
 }
 
 /**
@@ -50,9 +27,7 @@ function runCommand(modules, command, argv) {
  * @param [Object] argv
  */
 function processArgv(argv) {
-  const packageJsonPath = path.join(process.cwd(), 'package.json');
   let command = argv._[0];
-  let passToModules = true;
 
   // Allow shorthand "-v" for version
   if (argv.v) {
@@ -70,7 +45,6 @@ function processArgv(argv) {
       break;
     case 'new':
       require('./lib/new')(argv);
-      passToModules = false;
       break;
     case 'help':
     case undefined:
@@ -81,15 +55,20 @@ function processArgv(argv) {
       break;
   }
 
-  // CLI handles new command without passing through to modules
-  if (passToModules) {
-    if (fs.existsSync(packageJsonPath)) {
-      const modules = getModules(require(packageJsonPath));
-      runCommand(modules, command, argv);
+  // Look globally and locally for matching glob pattern
+  const dirs = [
+    `${process.cwd()}`, // local (where they ran the command from)
+    `${__dirname}/..`   // global (where this code exists)
+  ];
+
+  getGlobs(dirs).forEach(pkg => {
+    const module = require(path.dirname(pkg));
+    if (typeof module.runCommand === 'function') {
+      module.runCommand(command, argv);
     } else {
-      logger.info('No package.json file found in current working directory.');
+      logger.warn('Found matching module without exposed runCommand - %s', pkg);
     }
-  }
+  });
 
 }
 

@@ -17,7 +17,7 @@ describe('skyux CLI', () => {
       }
     });
 
-    const cli = require('../index');
+    const cli = mock.reRequire('../index');
     cli({ _: ['version'] });
     expect(called).toEqual(true);
   });
@@ -30,8 +30,19 @@ describe('skyux CLI', () => {
       }
     });
 
-    const cli = require('../index');
+    const cli = mock.reRequire('../index');
     cli({ _: [''], v: true });
+    expect(called).toEqual(true);
+  });
+
+  it('should accept known command help', () => {
+    let called = false;
+    mock('../lib/help', () => {
+      called = true;
+    });
+
+    const cli = mock.reRequire('../index');
+    cli({ _: ['help'] });
     expect(called).toEqual(true);
   });
 
@@ -41,7 +52,7 @@ describe('skyux CLI', () => {
       called = true;
     });
 
-    const cli = require('../index');
+    const cli = mock.reRequire('../index');
     cli({ _: [''], h: true });
     expect(called).toEqual(true);
   });
@@ -52,7 +63,7 @@ describe('skyux CLI', () => {
       called = true;
     });
 
-    const cli = require('../index');
+    const cli = mock.reRequire('../index');
     cli({ _: [undefined] });
     expect(called).toEqual(true);
   });
@@ -63,110 +74,89 @@ describe('skyux CLI', () => {
       called = true;
     });
 
-    const cli = require('../index');
+    const cli = mock.reRequire('../index');
     cli({ _: ['new'] });
     expect(called).toEqual(true);
-  });
-
-  it('should pass version command to devDependencies', () => {
-    let called = false;
-    spyOn(logger, 'info');
-    spyOn(fs, 'existsSync').and.returnValue(false);
-    mock('../lib/version', {
-      logVersion: () => {
-        called = true;
-      }
-    });
-
-    const cli = require('../index');
-    cli({ _: ['version'] });
-    expect(called).toEqual(true);
-    expect(logger.info).toHaveBeenCalledWith('No package.json file found in current working directory.');
-  });
-
-  it('should pass unknown command to devDependencies', () => {
-    spyOn(logger, 'info');
-    spyOn(fs, 'existsSync').and.returnValue(false);
-
-    const cli = require('../index');
-    cli({ _: ['test'] });
-    expect(logger.info).toHaveBeenCalledTimes(2);
-  });
-
-  it('should not pass new command to devDependencies', () => {
-    let called = false;
-    spyOn(logger, 'info');
-    spyOn(fs, 'existsSync').and.returnValue(false);
-    mock('../lib/new', () => {
-      called = true;
-    });
-
-    const cli = require('../index');
-    cli({ _: ['new'] });
-    expect(called).toEqual(true);
-    expect(logger.info).not.toHaveBeenCalled();
   });
 
   it('should accept unknown command', () => {
     spyOn(logger, 'info');
 
-    const cli = require('../index');
+    const cli = mock.reRequire('../index');
     cli({ _: ['test'] });
     expect(logger.info).toHaveBeenCalled();
   });
 
-  it('should work if package.json does not exist', () => {
-    spyOn(logger, 'info');
-    spyOn(fs, 'existsSync').and.returnValue(false);
+  function setupMock() {
+    const cwd = 'current-working-directory';
+    spyOn(process, 'cwd').and.returnValue(cwd);
 
-    const cli = require('../index');
-    cli({ _: ['test'] });
-    expect(logger.info).toHaveBeenCalled();
+    mock('path', {
+      dirname: (dir) => dir,
+      resolve: (dir, pattern) => dir + pattern
+    });
+
+    mock('glob', {
+      sync: (pattern) => {
+        if (pattern.indexOf(cwd) > -1) {
+          return [
+            'module-in-cwd'
+          ];
+        } else {
+          return [
+            'module-not-in-cwd'
+          ];
+        }
+      }
+    });
+  }
+
+  it('should look globally and locally for matching glob patterns', () => {
+
+    setupMock();
+    const customCommand = 'customCommand';
+
+    mock('module-in-cwd', {
+      runCommand: (cmd) => {
+        expect(cmd).toBe(customCommand);
+      }
+    });
+
+    mock('module-not-in-cwd', {
+      runCommand: (cmd) => {
+        expect(cmd).toBe(customCommand);
+      }
+    });
+
+    const cli = mock.reRequire('../index');
+    cli({ _: [customCommand] });
   });
 
-  it('should work if package.json exists without devDependencies', () => {
-    spyOn(logger, 'info');
-    spyOn(fs, 'existsSync').and.returnValue(true);
+  it('should log a warning if a matching glob pattern does not expose runCommand', () => {
 
-    let stubs = {};
-    stubs[path.join(process.cwd(), 'package.json')] = {
-      '@noCallThru': true
-    };
+    setupMock();
+    const customCommand = 'customCommand';
 
-    const cli = proxyquire('../index', stubs);
-    cli({ _: ['test'] });
-    expect(logger.info).toHaveBeenCalled();
-  });
+    mock('module-in-cwd', {
+      runCommand: (cmd) => {
+        expect(cmd).toBe(customCommand);
+      }
+    });
 
-  it('should work if package.json exists with matching devDependencies', () => {
+    mock('module-not-in-cwd', {
+      /* no runCommand */
+    });
+
     spyOn(logger, 'warn');
-    spyOn(fs, 'existsSync').and.returnValue(true);
 
-    let stubs = {};
-    let called = false;
-    stubs[path.join(process.cwd(), 'package.json')] = {
-      '@noCallThru': true,
-      devDependencies: {
-        'blackbaud-skyux-builder-test1': '0.0.1',
-        'blackbaud-skyux-builder-test2': '0.0.1'
-      }
-    };
+    const cli = mock.reRequire('../index');
+    cli({ _: [customCommand] });
 
-    stubs[path.join(process.cwd(), 'node_modules', 'blackbaud-skyux-builder-test1')] = {
-      '@noCallThru': true
-    };
+    expect(logger.warn).toHaveBeenCalledWith(
+      'Found matching module without exposed runCommand - %s',
+      'module-not-in-cwd'
+    );
 
-    stubs[path.join(process.cwd(), 'node_modules', 'blackbaud-skyux-builder-test2')] = {
-      '@noCallThru': true,
-      runCommand: () => {
-        called = true;
-      }
-    };
-
-    const cli = proxyquire('../index', stubs);
-    cli({ _: ['test'] });
-    expect(logger.warn).toHaveBeenCalled();
-    expect(called).toEqual(true);
   });
 
 });
