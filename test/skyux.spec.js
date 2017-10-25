@@ -93,7 +93,7 @@ describe('skyux CLI', () => {
 
     mock('path', {
       dirname: (dir) => dir,
-      resolve: (dir, pattern) => dir + pattern
+      join: (dir, pattern) => `${dir}/${pattern}`
     });
 
     mock('glob', {
