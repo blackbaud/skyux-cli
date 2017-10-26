@@ -92,19 +92,27 @@ describe('skyux CLI', () => {
     spyOn(process, 'cwd').and.returnValue(cwd);
 
     mock('path', {
-      dirname: (dir) => dir,
+      dirname: (dir) => dir.replace('/package.json', ''),
       join: (dir, pattern) => `${dir}/${pattern}`
+    });
+
+    mock('module-in-cwd/package.json', {
+      name: 'module-in-cwd-name'
+    });
+
+    mock('module-not-in-cwd/package.json', {
+      name: 'module-not-in-cwd-name'
     });
 
     mock('glob', {
       sync: (pattern) => {
         if (pattern.indexOf(cwd) > -1) {
           return [
-            'module-in-cwd'
+            'module-in-cwd/package.json'
           ];
         } else {
           return [
-            'module-not-in-cwd'
+            'module-not-in-cwd/package.json'
           ];
         }
       }
@@ -112,7 +120,7 @@ describe('skyux CLI', () => {
   }
 
   it('should look globally and locally for matching glob patterns', () => {
-
+    spyOn(logger, 'info');
     setupMock();
     const customCommand = 'customCommand';
 
@@ -130,6 +138,8 @@ describe('skyux CLI', () => {
 
     const cli = mock.reRequire('../index');
     cli({ _: [customCommand] });
+    expect(logger.info).toHaveBeenCalledWith(`Passing command to module-in-cwd-name`);
+    expect(logger.info).toHaveBeenCalledWith(`Passing command to module-not-in-cwd-name`);
   });
 
   it('should log a warning if a matching glob pattern does not expose runCommand', () => {
@@ -153,8 +163,7 @@ describe('skyux CLI', () => {
     cli({ _: [customCommand] });
 
     expect(logger.warn).toHaveBeenCalledWith(
-      'Found matching module without exposed runCommand - %s',
-      'module-not-in-cwd'
+      `Found matching module without exposed runCommand: module-not-in-cwd-name`
     );
 
   });

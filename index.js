@@ -63,10 +63,13 @@ function processArgv(argv) {
 
   getGlobs(dirs).forEach(pkg => {
     const module = require(path.dirname(pkg));
+    const pkgJson = require(pkg);
+
     if (typeof module.runCommand === 'function') {
+      logger.info(`Passing command to ${pkgJson.name}`);
       module.runCommand(command, argv);
     } else {
-      logger.warn('Found matching module without exposed runCommand - %s', pkg);
+      logger.warn(`Found matching module without exposed runCommand: ${pkgJson.name}`);
     }
   });
 
