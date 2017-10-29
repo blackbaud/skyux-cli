@@ -87,7 +87,7 @@ describe('skyux CLI', () => {
     expect(logger.info).toHaveBeenCalled();
   });
 
-  function setupMock() {
+  function setupMock(noNameProperty) {
     const cwd = 'current-working-directory';
     spyOn(process, 'cwd').and.returnValue(cwd);
 
@@ -96,13 +96,17 @@ describe('skyux CLI', () => {
       join: (dir, pattern) => `${dir}/${pattern}`
     });
 
-    mock('module-in-cwd/package.json', {
-      name: 'module-in-cwd-name'
-    });
-
-    mock('module-not-in-cwd/package.json', {
-      name: 'module-not-in-cwd-name'
-    });
+    if (noNameProperty) {
+      mock('module-in-cwd/package.json', {});
+      mock('module-not-in-cwd/package.json', {});
+    } else {
+      mock('module-in-cwd/package.json', {
+        name: 'module-in-cwd-name'
+      });
+      mock('module-not-in-cwd/package.json', {
+        name: 'module-not-in-cwd-name'
+      });
+    }
 
     mock('glob', {
       sync: (pattern) => {
@@ -142,7 +146,10 @@ describe('skyux CLI', () => {
     expect(logger.info).toHaveBeenCalledWith(`Passing command to module-not-in-cwd-name`);
   });
 
-  it('should log a warning if a matching glob pattern does not expose runCommand', () => {
+  it('should handle an error when requiring a malformed module', () => {
+
+    // not mocking module-not-in-cwd to simulate error
+    mock.stopAll();
 
     setupMock();
     const customCommand = 'customCommand';
@@ -153,19 +160,24 @@ describe('skyux CLI', () => {
       }
     });
 
-    mock('module-not-in-cwd', {
-      /* no runCommand */
-    });
-
-    spyOn(logger, 'warn');
+    spyOn(logger, 'error');
 
     const cli = mock.reRequire('../index');
     cli({ _: [customCommand] });
 
-    expect(logger.warn).toHaveBeenCalledWith(
-      `Found matching module without exposed runCommand: module-not-in-cwd-name`
+    expect(logger.error).toHaveBeenCalledWith(
+      `Error loading module: module-not-in-cwd/package.json`
     );
 
+  });
+
+  it('should not log package name if property does not exist', () => {
+    spyOn(logger, 'info');
+    setupMock(true);
+    const cli = mock.reRequire('../index');
+    cli({ _: ['customCommand'] });
+    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to module-in-cwd-name`);
+    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to module-not-in-cwd-name`);
   });
 
 });

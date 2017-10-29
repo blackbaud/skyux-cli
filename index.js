@@ -62,14 +62,21 @@ function processArgv(argv) {
   ];
 
   getGlobs(dirs).forEach(pkg => {
-    const module = require(path.dirname(pkg));
-    const pkgJson = require(pkg);
+    let module
+    let pkgJson;
 
-    if (typeof module.runCommand === 'function') {
-      logger.info(`Passing command to ${pkgJson.name}`);
+    try {
+      module = require(path.dirname(pkg));
+      pkgJson = require(pkg);
+    } catch(err) {
+      logger.error(`Error loading module: ${pkg}`);
+    }
+
+    if (module && typeof module.runCommand === 'function') {
+      if (pkgJson && pkgJson.name) {
+        logger.info(`Passing command to ${pkgJson.name}`);
+      }
       module.runCommand(command, argv);
-    } else {
-      logger.warn(`Found matching module without exposed runCommand: ${pkgJson.name}`);
     }
   });
 
