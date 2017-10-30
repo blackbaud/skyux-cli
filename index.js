@@ -64,7 +64,7 @@ function processArgv(argv) {
 
   getGlobs(dirs).forEach(pkg => {
     let module;
-    let pkgJson;
+    let pkgJson = {};
 
     try {
       module = require(path.dirname(pkg));
@@ -74,10 +74,8 @@ function processArgv(argv) {
     }
 
     if (module && typeof module.runCommand === 'function') {
-      if (pkgJson && pkgJson.name) {
-        logger.info(`Passing command to ${pkgJson.name}`);
-      }
-      
+      const pkgName = pkgJson.name || pkg;
+      logger.info(`Passing command to ${pkgName}`);
       module.runCommand(command, argv);
     }
   });
