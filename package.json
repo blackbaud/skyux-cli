@@ -9,8 +9,8 @@
   },
   "scripts": {
     "coverage": "istanbul cover --report=html ./node_modules/jasmine/bin/jasmine.js JASMINE_CONFIG_PATH=jasmine.json",
-    "jscs": "jscs bin lib",
-    "jshint": "jshint bin lib",
+    "jscs": "jscs bin lib index.js",
+    "jshint": "jshint bin lib index.js",
     "lint": "npm run jshint && npm run jscs",
     "test": "npm run lint && npm run coverage"
   },

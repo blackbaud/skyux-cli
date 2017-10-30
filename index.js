@@ -14,7 +14,8 @@ function getGlobs(dirs) {
   let globs = [];
 
   dirs.forEach(dir => {
-    globs = globs.concat(glob.sync(path.join(dir, '/node_modules/**/*skyux-builder*/package.json')));
+    const joined = path.join(dir, '/node_modules/**/*skyux-builder*/package.json');
+    globs = globs.concat(glob.sync(joined));
   });
 
   return globs;
@@ -62,13 +63,13 @@ function processArgv(argv) {
   ];
 
   getGlobs(dirs).forEach(pkg => {
-    let module
+    let module;
     let pkgJson;
 
     try {
       module = require(path.dirname(pkg));
       pkgJson = require(pkg);
-    } catch(err) {
+    } catch (err) {
       logger.error(`Error loading module: ${pkg}`);
     }
 
@@ -76,6 +77,7 @@ function processArgv(argv) {
       if (pkgJson && pkgJson.name) {
         logger.info(`Passing command to ${pkgJson.name}`);
       }
+      
       module.runCommand(command, argv);
     }
   });
