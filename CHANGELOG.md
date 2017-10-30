@@ -1,4 +1,8 @@
-# 1.0.0-rc.1 (2017-09-14)
+# 1.1.0 (2017-10-30)
+
+- Made finding modules to process SKY UX commands less restrictive. [#135](https://github.com/blackbaud/skyux-cli/pull/135)
+
+# 1.0.0 (2017-09-27)
 
 - Determining the latest versions of `@blackbaud/skyux` and `@blackbaud/skyux-builder` before the `npm install` step of `skyux new`. [#130](https://github.com/blackbaud/skyux-cli/pull/130)
 
