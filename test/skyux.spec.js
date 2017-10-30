@@ -17,7 +17,7 @@ describe('skyux CLI', () => {
       }
     });
 
-    const cli = require('../index');
+    const cli = mock.reRequire('../index');
     cli({ _: ['version'] });
     expect(called).toEqual(true);
   });
@@ -30,8 +30,19 @@ describe('skyux CLI', () => {
       }
     });
 
-    const cli = require('../index');
+    const cli = mock.reRequire('../index');
     cli({ _: [''], v: true });
+    expect(called).toEqual(true);
+  });
+
+  it('should accept known command help', () => {
+    let called = false;
+    mock('../lib/help', () => {
+      called = true;
+    });
+
+    const cli = mock.reRequire('../index');
+    cli({ _: ['help'] });
     expect(called).toEqual(true);
   });
 
@@ -41,7 +52,7 @@ describe('skyux CLI', () => {
       called = true;
     });
 
-    const cli = require('../index');
+    const cli = mock.reRequire('../index');
     cli({ _: [''], h: true });
     expect(called).toEqual(true);
   });
@@ -52,7 +63,7 @@ describe('skyux CLI', () => {
       called = true;
     });
 
-    const cli = require('../index');
+    const cli = mock.reRequire('../index');
     cli({ _: [undefined] });
     expect(called).toEqual(true);
   });
@@ -63,110 +74,110 @@ describe('skyux CLI', () => {
       called = true;
     });
 
-    const cli = require('../index');
+    const cli = mock.reRequire('../index');
     cli({ _: ['new'] });
     expect(called).toEqual(true);
-  });
-
-  it('should pass version command to devDependencies', () => {
-    let called = false;
-    spyOn(logger, 'info');
-    spyOn(fs, 'existsSync').and.returnValue(false);
-    mock('../lib/version', {
-      logVersion: () => {
-        called = true;
-      }
-    });
-
-    const cli = require('../index');
-    cli({ _: ['version'] });
-    expect(called).toEqual(true);
-    expect(logger.info).toHaveBeenCalledWith('No package.json file found in current working directory.');
-  });
-
-  it('should pass unknown command to devDependencies', () => {
-    spyOn(logger, 'info');
-    spyOn(fs, 'existsSync').and.returnValue(false);
-
-    const cli = require('../index');
-    cli({ _: ['test'] });
-    expect(logger.info).toHaveBeenCalledTimes(2);
-  });
-
-  it('should not pass new command to devDependencies', () => {
-    let called = false;
-    spyOn(logger, 'info');
-    spyOn(fs, 'existsSync').and.returnValue(false);
-    mock('../lib/new', () => {
-      called = true;
-    });
-
-    const cli = require('../index');
-    cli({ _: ['new'] });
-    expect(called).toEqual(true);
-    expect(logger.info).not.toHaveBeenCalled();
   });
 
   it('should accept unknown command', () => {
     spyOn(logger, 'info');
 
-    const cli = require('../index');
+    const cli = mock.reRequire('../index');
     cli({ _: ['test'] });
     expect(logger.info).toHaveBeenCalled();
   });
 
-  it('should work if package.json does not exist', () => {
-    spyOn(logger, 'info');
-    spyOn(fs, 'existsSync').and.returnValue(false);
+  function setupMock(noNameProperty) {
+    const cwd = 'current-working-directory';
+    spyOn(process, 'cwd').and.returnValue(cwd);
 
-    const cli = require('../index');
-    cli({ _: ['test'] });
-    expect(logger.info).toHaveBeenCalled();
-  });
+    mock('path', {
+      dirname: (dir) => dir.replace('/package.json', ''),
+      join: (dir, pattern) => `${dir}/${pattern}`
+    });
 
-  it('should work if package.json exists without devDependencies', () => {
-    spyOn(logger, 'info');
-    spyOn(fs, 'existsSync').and.returnValue(true);
+    if (noNameProperty) {
+      mock('module-in-cwd/package.json', {});
+      mock('module-not-in-cwd/package.json', {});
+    } else {
+      mock('module-in-cwd/package.json', {
+        name: 'module-in-cwd-name'
+      });
+      mock('module-not-in-cwd/package.json', {
+        name: 'module-not-in-cwd-name'
+      });
+    }
 
-    let stubs = {};
-    stubs[path.join(process.cwd(), 'package.json')] = {
-      '@noCallThru': true
-    };
-
-    const cli = proxyquire('../index', stubs);
-    cli({ _: ['test'] });
-    expect(logger.info).toHaveBeenCalled();
-  });
-
-  it('should work if package.json exists with matching devDependencies', () => {
-    spyOn(logger, 'warn');
-    spyOn(fs, 'existsSync').and.returnValue(true);
-
-    let stubs = {};
-    let called = false;
-    stubs[path.join(process.cwd(), 'package.json')] = {
-      '@noCallThru': true,
-      devDependencies: {
-        'blackbaud-skyux-builder-test1': '0.0.1',
-        'blackbaud-skyux-builder-test2': '0.0.1'
+    mock('glob', {
+      sync: (pattern) => {
+        if (pattern.indexOf(cwd) > -1) {
+          return [
+            'module-in-cwd/package.json'
+          ];
+        } else {
+          return [
+            'module-not-in-cwd/package.json'
+          ];
+        }
       }
-    };
+    });
+  }
 
-    stubs[path.join(process.cwd(), 'node_modules', 'blackbaud-skyux-builder-test1')] = {
-      '@noCallThru': true
-    };
+  it('should look globally and locally for matching glob patterns', () => {
+    spyOn(logger, 'info');
+    setupMock();
+    const customCommand = 'customCommand';
 
-    stubs[path.join(process.cwd(), 'node_modules', 'blackbaud-skyux-builder-test2')] = {
-      '@noCallThru': true,
-      runCommand: () => {
-        called = true;
+    mock('module-in-cwd', {
+      runCommand: (cmd) => {
+        expect(cmd).toBe(customCommand);
       }
-    };
+    });
 
-    const cli = proxyquire('../index', stubs);
-    cli({ _: ['test'] });
-    expect(logger.warn).toHaveBeenCalled();
-    expect(called).toEqual(true);
+    mock('module-not-in-cwd', {
+      runCommand: (cmd) => {
+        expect(cmd).toBe(customCommand);
+      }
+    });
+
+    const cli = mock.reRequire('../index');
+    cli({ _: [customCommand] });
+    expect(logger.info).toHaveBeenCalledWith(`Passing command to module-in-cwd-name`);
+    expect(logger.info).toHaveBeenCalledWith(`Passing command to module-not-in-cwd-name`);
+  });
+
+  it('should handle an error when requiring a malformed module', () => {
+
+    // not mocking module-not-in-cwd to simulate error
+    mock.stopAll();
+
+    setupMock();
+    const customCommand = 'customCommand';
+
+    mock('module-in-cwd', {
+      runCommand: (cmd) => {
+        expect(cmd).toBe(customCommand);
+      }
+    });
+
+    spyOn(logger, 'error');
+
+    const cli = mock.reRequire('../index');
+    cli({ _: [customCommand] });
+
+    expect(logger.error).toHaveBeenCalledWith(
+      `Error loading module: module-not-in-cwd/package.json`
+    );
+
+  });
+
+  it('should not log package name if property does not exist', () => {
+    spyOn(logger, 'info');
+    setupMock(true);
+    const cli = mock.reRequire('../index');
+    cli({ _: ['customCommand'] });
+    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to module-in-cwd-name`);
+    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to module-not-in-cwd-name`);
   });
 
 });
