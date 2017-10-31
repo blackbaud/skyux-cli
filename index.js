@@ -28,6 +28,8 @@ function getGlobs(dirs) {
  * @param [Object] argv
  */
 function processArgv(argv) {
+
+  let verbose = argv.verbose;
   let command = argv._[0];
 
   // Allow shorthand "-v" for version
@@ -42,6 +44,7 @@ function processArgv(argv) {
 
   switch (command) {
     case 'version':
+      verbose = true;
       require('./lib/version').logVersion(argv);
       break;
     case 'new':
@@ -49,10 +52,11 @@ function processArgv(argv) {
       break;
     case 'help':
     case undefined:
+      verbose = true;
       require('./lib/help')(argv);
       break;
     default:
-      logger.info('SKY UX processing command %s', command);
+      logger.info(`SKY UX processing command ${command}`);
       break;
   }
 
@@ -72,12 +76,17 @@ function processArgv(argv) {
       module = require(dirName);
       pkgJson = require(pkg);
     } catch (err) {
-      logger.info(`Error loading module: ${pkg}`);
+      if (verbose) {
+        logger.info(`Error loading module: ${pkg}`);
+      }
     }
 
     if (module && typeof module.runCommand === 'function') {
-      const pkgName = pkgJson.name || dirName;
-      logger.info(`Passing command to ${pkgName}`);
+      if (verbose) {
+        const pkgName = pkgJson.name || dirName;
+        logger.info(`Passing command to ${pkgName}`);
+      }
+
       module.runCommand(command, argv);
     }
   });
