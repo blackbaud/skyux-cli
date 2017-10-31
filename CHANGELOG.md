@@ -1,3 +1,7 @@
+# 1.1.1 (2017-10-31)
+
+- Bugfix when looking for modules globally. [#138](https://github.com/blackbaud/skyux-cli/pull/138)
+
 # 1.1.0 (2017-10-30)
 
 - Made finding modules to process SKY UX commands less restrictive. [#135](https://github.com/blackbaud/skyux-cli/pull/135)
