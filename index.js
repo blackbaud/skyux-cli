@@ -62,7 +62,7 @@ function processArgv(argv) {
 
   // Look globally and locally for matching glob pattern
   const dirs = [
-    `${process.cwd()}/node_modules`, // local (where they ran the command from)
+    `${process.cwd()}/node_modules/*`, // local (where they ran the command from)
     `${__dirname}/..`,  // global, if scoped package (where this code exists)
     `${__dirname}/../..`, // global, if not scoped package
   ];
