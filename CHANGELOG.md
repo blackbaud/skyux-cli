@@ -1,6 +1,6 @@
 # 1.1.2 (2017-10-31)
 
-- Bugfix when looking scoped modules locally. [#141](https://github.com/blackbaud/skyux-cli/pull/141)
+- Bugfix when looking for scoped modules locally. [#141](https://github.com/blackbaud/skyux-cli/pull/141)
 
 # 1.1.1 (2017-10-31)
 
