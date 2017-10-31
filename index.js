@@ -14,7 +14,7 @@ function getGlobs(dirs) {
   let globs = [];
 
   dirs.forEach(dir => {
-    const joined = path.join(dir, '/node_modules/**/*skyux-builder*/package.json');
+    const joined = path.join(dir, '/skyux-builder*/package.json');
     globs = globs.concat(glob.sync(joined));
   });
 
@@ -58,23 +58,25 @@ function processArgv(argv) {
 
   // Look globally and locally for matching glob pattern
   const dirs = [
-    `${process.cwd()}`, // local (where they ran the command from)
-    `${__dirname}/..`   // global (where this code exists)
+    `${process.cwd()}/node_modules`, // local (where they ran the command from)
+    `${__dirname}/..`,  // global, if scoped package (where this code exists)
+    `${__dirname}/../..`, // global, if not scoped package
   ];
 
   getGlobs(dirs).forEach(pkg => {
-    let module;
+    const dirName = path.dirname(pkg);
     let pkgJson = {};
+    let module;
 
     try {
-      module = require(path.dirname(pkg));
+      module = require(dirName);
       pkgJson = require(pkg);
     } catch (err) {
-      logger.error(`Error loading module: ${pkg}`);
+      logger.info(`Error loading module: ${pkg}`);
     }
 
     if (module && typeof module.runCommand === 'function') {
-      const pkgName = pkgJson.name || pkg;
+      const pkgName = pkgJson.name || dirName;
       logger.info(`Passing command to ${pkgName}`);
       module.runCommand(command, argv);
     }
