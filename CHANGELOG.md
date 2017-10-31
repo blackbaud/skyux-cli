@@ -1,7 +1,7 @@
 # 1.1.1 (2017-10-31)
 
 - Bugfix when looking for modules globally. [#138](https://github.com/blackbaud/skyux-cli/pull/138)
-- Only logging some information when the `--verbose` flag is used. [#140](https://github.com/blackbaud/skyux-cli/pull/140)
+- Use the `--verbose` flag to log additional information. [#140](https://github.com/blackbaud/skyux-cli/pull/140git commi)
 
 # 1.1.0 (2017-10-30)
 
