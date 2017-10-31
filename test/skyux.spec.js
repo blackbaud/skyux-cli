@@ -152,7 +152,7 @@ fdescribe('skyux CLI', () => {
 
     const cli = mock.reRequire('../index');
     cli({ _: ['unknownCommand'] });
-    expect(logger.info).toHaveBeenCalled();
+    expect(logger.info).toHaveBeenCalledWith(`SKY UX processing command unknownCommand`);
   });
 
   it('should look globally and locally for matching glob patterns', () => {
@@ -179,13 +179,35 @@ fdescribe('skyux CLI', () => {
     });
 
     const cli = mock.reRequire('../index');
-    cli({ _: [customCommand] });
+    cli({ _: [customCommand], verbose: true });
     expect(logger.info).toHaveBeenCalledWith(`Passing command to local-module-name`);
     expect(logger.info).toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
     expect(logger.info).toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
   });
 
-  it('should handle an error when requiring a malformed module', () => {
+  it('should handle an error when requiring a malformed module and log when verbose', () => {
+    setupMock();
+    const customCommand = 'customCommand';
+
+    // not mocking global modules to simulate error
+    mock('local-module', {
+      runCommand: (cmd) => {
+        expect(cmd).toBe(customCommand);
+      }
+    });
+
+    spyOn(logger, 'info');
+
+    const cli = mock.reRequire('../index');
+    cli({ _: [customCommand], verbose: true });
+
+    expect(logger.info).toHaveBeenCalledWith(
+      `Error loading module: non-scoped-global-module/package.json`
+    );
+
+  });
+
+  it('should handle an error when requiring a malformed module and not log when not verbose', () => {
     setupMock();
     const customCommand = 'customCommand';
 
@@ -201,13 +223,40 @@ fdescribe('skyux CLI', () => {
     const cli = mock.reRequire('../index');
     cli({ _: [customCommand] });
 
-    expect(logger.info).toHaveBeenCalledWith(
+    expect(logger.info).not.toHaveBeenCalledWith(
       `Error loading module: non-scoped-global-module/package.json`
     );
 
   });
 
-  it('should use path if name property does not exist in package.json', () => {
+  it('should log path if name property does not exist in package.json when verbose', () => {
+    spyOn(logger, 'info');
+    setupMock(true);
+
+    mock('local-module', {
+      runCommand: () => {}
+    });
+
+    mock('non-scoped-global-module', {
+      runCommand: () => {}
+    });
+
+    mock('scoped-global-module', {
+      runCommand: () => {}
+    });
+
+    const cli = mock.reRequire('../index');
+    cli({ _: ['customCommand'], verbose: true });
+
+    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to local-module-name`);
+    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
+    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
+    expect(logger.info).toHaveBeenCalledWith(`Passing command to local-module`);
+    expect(logger.info).toHaveBeenCalledWith(`Passing command to non-scoped-global-module`);
+    expect(logger.info).toHaveBeenCalledWith(`Passing command to scoped-global-module`);
+  });
+
+  it('should not log path or name property when not vebose', () => {
     spyOn(logger, 'info');
     setupMock(true);
 
@@ -229,9 +278,9 @@ fdescribe('skyux CLI', () => {
     expect(logger.info).not.toHaveBeenCalledWith(`Passing command to local-module-name`);
     expect(logger.info).not.toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
     expect(logger.info).not.toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
-    expect(logger.info).toHaveBeenCalledWith(`Passing command to local-module`);
-    expect(logger.info).toHaveBeenCalledWith(`Passing command to non-scoped-global-module`);
-    expect(logger.info).toHaveBeenCalledWith(`Passing command to scoped-global-module`);
-  });
+    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to local-module`);
+    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to non-scoped-global-module`);
+    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to scoped-global-module`);
+  })
 
 });
