@@ -67,6 +67,8 @@ function processArgv(argv) {
     `${__dirname}/../..`, // global, if not scoped package
   ];
 
+  let modulesCalled = {};
+
   getGlobs(dirs).forEach(pkg => {
     const dirName = path.dirname(pkg);
     let pkgJson = {};
@@ -82,12 +84,18 @@ function processArgv(argv) {
     }
 
     if (module && typeof module.runCommand === 'function') {
+      const pkgName = pkgJson.name || dirName;
+
       if (verbose) {
-        const pkgName = pkgJson.name || dirName;
         logger.info(`Passing command to ${pkgName}`);
       }
 
-      module.runCommand(command, argv);
+      if (modulesCalled[pkgName]) {
+        logger.info(`Skipping multiple instances of ${pkgName}`);
+      } else {
+        module.runCommand(command, argv);
+        modulesCalled[pkgName] = true;
+      }
     }
   });
 
