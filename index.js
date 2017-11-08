@@ -22,6 +22,17 @@ function getGlobs(dirs) {
 }
 
 /**
+ * Only log a message if verbose is enabled.
+ * @param {boolean} verbose
+ * @param {string} msg
+ */
+function log(isVerbose, msg) {
+  if (isVerbose) {
+    logger.info(msg);
+  }
+}
+
+/**
  * Processes an argv object.
  * Reads package.json if it exists.
  * @name processArgv
@@ -78,21 +89,16 @@ function processArgv(argv) {
       module = require(dirName);
       pkgJson = require(pkg);
     } catch (err) {
-      if (verbose) {
-        logger.info(`Error loading module: ${pkg}`);
-      }
+      log(verbose, `Error loading module: ${pkg}`);
     }
 
     if (module && typeof module.runCommand === 'function') {
       const pkgName = pkgJson.name || dirName;
 
-      if (verbose) {
-        logger.info(`Passing command to ${pkgName}`);
-      }
-
       if (modulesCalled[pkgName]) {
-        logger.info(`Skipping multiple instances of ${pkgName}`);
+        log(verbose, `Multiple instances found. Skipping passing command to ${pkgName}`);
       } else {
+        log(verbose, `Passing command to ${pkgName}`);
         module.runCommand(command, argv);
         modulesCalled[pkgName] = true;
       }

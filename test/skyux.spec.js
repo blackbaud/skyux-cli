@@ -331,7 +331,7 @@ fdescribe('skyux CLI', () => {
     cli({ _: ['customCommand'], verbose: true });
 
     expect(logger.info).toHaveBeenCalledWith(`Passing command to duplicate-module-name`);
-    expect(logger.info).toHaveBeenCalledWith(`Skipping multiple instances of duplicate-module-name`);
+    expect(logger.info).toHaveBeenCalledWith(`Multiple instances found. Skipping passing command to duplicate-module-name`);
   });
 
 });
