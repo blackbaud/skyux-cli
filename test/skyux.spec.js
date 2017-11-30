@@ -281,6 +281,57 @@ fdescribe('skyux CLI', () => {
     expect(logger.info).not.toHaveBeenCalledWith(`Passing command to local-module`);
     expect(logger.info).not.toHaveBeenCalledWith(`Passing command to non-scoped-global-module`);
     expect(logger.info).not.toHaveBeenCalledWith(`Passing command to scoped-global-module`);
-  })
+  });
+
+  it('should not call the same package more than once', () => {
+
+    const cwd = 'current-working-directory';
+    spyOn(process, 'cwd').and.returnValue(cwd);
+    spyOn(logger, 'info');
+
+    mock('path', {
+      dirname: (dir) => dir.replace('/package.json', ''),
+      join: (dir, pattern) => `${dir}/${pattern}`
+    });
+
+    mock('local-module/package.json', {
+      name: 'duplicate-module-name'
+    });
+
+    mock('global-module/package.json', {
+      name: 'duplicate-module-name'
+    });
+
+    mock('local-module', {
+      runCommand: () => {}
+    });
+
+    mock('global-module', {
+      runCommand: () => {}
+    });
+
+    mock('glob', {
+      sync: (pattern) => {
+
+        // Emulates local package installed
+        if (pattern.indexOf(cwd) > -1) {
+          return [
+            'local-module/package.json'
+          ];
+
+        } else {
+          return [
+            'global-module/package.json'
+          ];
+        }
+      }
+    });
+
+    const cli = mock.reRequire('../index');
+    cli({ _: ['customCommand'], verbose: true });
+
+    expect(logger.info).toHaveBeenCalledWith(`Passing command to duplicate-module-name`);
+    expect(logger.info).toHaveBeenCalledWith(`Multiple instances found. Skipping passing command to duplicate-module-name`);
+  });
 
 });
