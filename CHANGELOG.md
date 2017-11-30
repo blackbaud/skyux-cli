@@ -1,3 +1,7 @@
+# 1.1.3 (2017-11-30)
+
+- Bugfix to prevent multiple calls to a module. [#143](https://github.com/blackbaud/skyux-cli/pull/143)
+
 # 1.1.2 (2017-10-31)
 
 - Bugfix when looking for scoped modules locally. [#141](https://github.com/blackbaud/skyux-cli/pull/141)
