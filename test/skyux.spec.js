@@ -1,14 +1,11 @@
 /*jshint jasmine: true, node: true */
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const glob = require('glob');
 const mock = require('mock-require');
-const proxyquire = require('proxyquire');
-const logger = require('winston');
+const logger = require('../utils/logger');
 
-fdescribe('skyux CLI', () => {
+describe('skyux CLI', () => {
 
   afterEach(() => {
     mock.stopAll();

@@ -8,7 +8,8 @@ const minimist = require('minimist');
 const argv = minimist(process.argv.slice(2));
 const color = argv.hasOwnProperty('color') ? argv.color : true;
 
-const logger = new winston.Logger({
+
+module.exports = new winston.Logger({
   transports: [
     new winston.transports.Console({
       level: 'debug',
@@ -18,5 +19,3 @@ const logger = new winston.Logger({
     })
   ]
 });
-
-module.exports = logger;
