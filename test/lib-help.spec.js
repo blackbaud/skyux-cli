@@ -3,13 +3,12 @@
 
 const fs = require('fs-extra');
 const mock = require('mock-require');
+const logger = require('@blackbaud/skyux-logger');
 
 describe('skyux help command', () => {
-  let logger;
 
   beforeEach(() => {
-    logger = jasmine.createSpyObj('logger', ['info', 'error']);
-    mock('../utils/logger', logger);
+    spyOn(logger);
   });
 
   afterEach(() => {

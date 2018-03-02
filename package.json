@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/blackbaud/skyux-cli#readme",
   "dependencies": {
+    "@blackbaud/skyux-logger": "blackbaud/skyux-logger#initial-commit",
     "cross-spawn": "5.1.0",
     "fs-extra": "4.0.1",
     "git-clone": "0.1.0",
@@ -37,8 +38,7 @@
     "minimist": "1.2.0",
     "open": "0.0.5",
     "promptly": "2.2.0",
-    "update-notifier": "2.2.0",
-    "winston": "2.3.1"
+    "update-notifier": "2.2.0"
   },
   "devDependencies": {
     "istanbul": "0.4.5",

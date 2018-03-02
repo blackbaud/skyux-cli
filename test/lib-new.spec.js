@@ -4,9 +4,9 @@
 const fs = require('fs-extra');
 const mock = require('mock-require');
 const EventEmitter = require('events').EventEmitter;
+const logger = require('@blackbaud/skyux-logger');
 
 let emitter;
-let logger;
 
 const sendLine = (line, cb) => {
   setImmediate(() => {
@@ -29,8 +29,10 @@ describe('skyux new command', () => {
 
   beforeEach(() => {
 
-    logger = jasmine.createSpyObj('logger', ['info', 'error', 'custom']);
-    mock('../utils/logger', logger);
+    spyOn(logger, 'info');
+    spyOn(logger, 'warning');
+    spyOn(logger, 'error');
+    spyOn(logger, 'verbose');
 
     mock('git-clone', (url, path, cb) => {
       cb(customError);
