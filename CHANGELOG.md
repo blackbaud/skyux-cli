@@ -1,3 +1,7 @@
+# 1.2.0 (2018-02-07)
+
+- Updated the `--template` flag to accept a git url.
+
 # 1.1.3 (2017-11-30)
 
 - Bugfix to prevent multiple calls to a module. [#143](https://github.com/blackbaud/skyux-cli/pull/143)
