@@ -68,9 +68,27 @@ describe('skyux new command', () => {
     });
   });
 
-  it('should clone custom template repositories', (done) => {
+  it('should use the template flag as a GitHub repo name if it does not contain a colon', (done) => {
     spyOn(logger, 'info');
     const customTemplateName = 'valid-template-name';
+    const skyuxNew = require('../lib/new')({
+      template: customTemplateName
+    });
+    sendLine('some-spa-name', () => {
+      sendLine('', () => {
+        skyuxNew.then(() => {
+          expect(logger.info).toHaveBeenCalledWith(
+            `${customTemplateName} template successfully cloned.`
+          );
+          done();
+        });
+      });
+    });
+  });
+
+  it('should use the template flag as a Git URL if it contains a colon', (done) => {
+    spyOn(logger, 'info');
+    const customTemplateName = 'https://vsts.com/my-repo.git';
     const skyuxNew = require('../lib/new')({
       template: customTemplateName
     });
