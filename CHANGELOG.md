@@ -1,6 +1,6 @@
 # 1.2.0 (2018-02-07)
 
-- Updated the `--template` flag to accept a git url.
+- Updated the `--template` flag to accept a Git URL.
 
 # 1.1.3 (2017-11-30)
 
