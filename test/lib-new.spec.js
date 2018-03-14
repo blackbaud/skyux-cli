@@ -4,7 +4,6 @@
 const fs = require('fs-extra');
 const mock = require('mock-require');
 const EventEmitter = require('events').EventEmitter;
-const logger = require('@blackbaud/skyux-logger');
 
 let emitter;
 
@@ -15,24 +14,26 @@ const sendLine = (line, cb) => {
   });
 };
 
-let stdout = null;
 let customError = '';
 let versionsRequested;
+let logger;
+let spyWrite;
 
-const oldWrite = process.stdout.write;
-process.stdout.write = function (data) {
-  stdout += data;
-  return oldWrite.apply(process.stdout, arguments);
-};
-
-describe('skyux new command', () => {
+fdescribe('skyux new command', () => {
 
   beforeEach(() => {
 
-    spyOn(logger, 'info');
-    spyOn(logger, 'warning');
-    spyOn(logger, 'error');
-    spyOn(logger, 'verbose');
+    logger = jasmine.createSpyObj(
+      'logger',
+      [
+        'info',
+        'warn',
+        'error',
+        'verbose',
+        'bobby'
+      ]
+    );
+    mock('@blackbaud/skyux-logger', logger);
 
     mock('git-clone', (url, path, cb) => {
       cb(customError);
@@ -50,24 +51,33 @@ describe('skyux new command', () => {
       return Promise.resolve(`${dep}-LATEST`);
     });
 
+    spyWrite = spyOn(process.stdout, 'write');
+
     customError = null;
-    stdout = '';
   });
 
   afterEach(() => {
     mock.stopAll();
   });
 
+  function spyOnPrompt() {
+    const prompt = jasmine.createSpy('prompt').and.callFake(() => Promise.resolve());
+    mock('promptly', { prompt });
+    return prompt;
+  }
+
   it('should ask for a spa name and url', (done) => {
+    const prompt = spyOnPrompt();
     spyOn(fs, 'readJsonSync').and.returnValue({});
     spyOn(fs, 'writeJsonSync');
+
     mock.reRequire('../lib/new')();
     sendLine('some-spa-name', () => {
       sendLine('', () => {
-        expect(stdout).toContain(
+        expect(prompt.calls.argsFor(0)).toContain(
           'What is the root directory for your SPA? (example: my-spa-name)'
         );
-        expect(stdout).toContain(
+        expect(prompt.calls.argsFor(1)).toContain(
           'What is the URL to your repo? (leave this blank if you don\'t know)'
         );
         done();
@@ -76,6 +86,7 @@ describe('skyux new command', () => {
   });
 
   it('should clone custom template repositories', (done) => {
+    spyOnPrompt();
     const customTemplateName = 'valid-template-name';
     const skyuxNew = mock.reRequire('../lib/new')({
       template: customTemplateName
@@ -111,6 +122,7 @@ describe('skyux new command', () => {
   });
 
   it('should clone the default template if template flag is used without a name', (done) => {
+    spyOnPrompt();
     const skyuxNew = mock.reRequire('../lib/new')({
       template: true
     });
@@ -125,6 +137,7 @@ describe('skyux new command', () => {
   });
 
   it('should clone the default template if custom template not provided', (done) => {
+    spyOnPrompt();
     const skyuxNew = mock.reRequire('../lib/new')();
     sendLine('some-spa-name', () => {
       sendLine('', () => {
@@ -139,8 +152,8 @@ describe('skyux new command', () => {
   it('should catch a spa name with invalid characters', (done) => {
     mock.reRequire('../lib/new')();
     sendLine('This Is Invalid', () => {
-      expect(stdout).toContain(
-        'SPA root directories may only contain lower-case letters, numbers or dashes.\n'
+      expect(spyWrite.calls.allArgs()).toContain(
+        ['SPA root directories may only contain lower-case letters, numbers or dashes.\n']
       );
       done();
     });
@@ -150,7 +163,7 @@ describe('skyux new command', () => {
     spyOn(fs, 'existsSync').and.returnValue(true);
     mock.reRequire('../lib/new')();
     sendLine('some-spa-name', () => {
-      expect(stdout).toContain('SPA directory already exists.\n');
+      expect(spyWrite.calls.allArgs()).toContain(['SPA directory already exists.\n']);
       done();
     });
   });
@@ -340,6 +353,7 @@ describe('skyux new command', () => {
       '.gitignore'
     ]);
     spyOn(fs, 'readJsonSync').and.returnValue({});
+    spyOnPrompt();
     const skyuxNew = mock.reRequire('../lib/new')();
     sendLine('some-spa-name', () => {
       sendLine('some-spa-repo', () => {

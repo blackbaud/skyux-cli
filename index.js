@@ -3,7 +3,7 @@
 
 const path = require('path');
 const glob = require('glob');
-const logger = require('./utils/logger');
+const logger = require('@blackbaud/skyux-logger');
 
 /**
  * Returns results of glob.sync from specified directory and our glob pattern.
