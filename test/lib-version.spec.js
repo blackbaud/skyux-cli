@@ -3,7 +3,7 @@
 
 const path = require('path');
 const proxyquire = require('proxyquire');
-const logger = require('winston');
+const logger = require('@blackbaud/skyux-logger');
 
 describe('skyux version command', () => {
   it('should return the version in package.json when using getVersion()', () => {
