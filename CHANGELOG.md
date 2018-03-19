@@ -1,3 +1,7 @@
+# 1.3.0 (2018-03-16)
+
+- Migrated all logging to use the `@blackbaud/skyux-logger` package. [#145](https://github.com/blackbaud/skyux-builder/pull/145)
+
 # 1.2.0 (2018-02-07)
 
 - Updated the `--template` flag to accept a Git URL.
