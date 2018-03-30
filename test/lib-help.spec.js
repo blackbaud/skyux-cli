@@ -8,7 +8,7 @@ const logger = require('@blackbaud/skyux-logger');
 describe('skyux help command', () => {
 
   beforeEach(() => {
-    spyOn(logger);
+    spyOn(logger, 'info');
   });
 
   afterEach(() => {
