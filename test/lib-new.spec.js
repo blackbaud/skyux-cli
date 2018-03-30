@@ -19,7 +19,7 @@ let versionsRequested;
 let logger;
 let spyWrite;
 
-fdescribe('skyux new command', () => {
+describe('skyux new command', () => {
 
   beforeEach(() => {
 
