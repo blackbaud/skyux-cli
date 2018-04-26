@@ -13,10 +13,14 @@ const logger = require('@blackbaud/skyux-logger');
 function getGlobs(dirs) {
   let globs = [];
 
+  const globPattern = '/skyux-builder*/package.json';
   dirs.forEach(dir => {
-    const joined = path.join(dir, '/skyux-builder*/package.json');
+    const joined = path.join(dir, globPattern);
     globs = globs.concat(glob.sync(joined));
   });
+  if (globs.length === 0) {
+    fatal(`No files found for glob ${globPattern}. Have you ran "npm install"?`);
+  }
 
   return globs;
 }
@@ -33,43 +37,17 @@ function log(isVerbose, msg) {
 }
 
 /**
- * Processes an argv object.
- * Reads package.json if it exists.
- * @name processArgv
- * @param [Object] argv
+ * Log fatal error and exit
+ * @param {string} msg
  */
-function processArgv(argv) {
+function fatal(msg) {
+  logger.error(msg);
+  process.exit(1);
+}
 
+function invokeCommand(argv) {
   let verbose = argv.verbose;
   let command = argv._[0];
-
-  // Allow shorthand "-v" for version
-  if (argv.v) {
-    command = 'version';
-  }
-
-  // Allow shorthand "-h" for help
-  if (argv.h) {
-    command = 'help';
-  }
-
-  switch (command) {
-    case 'version':
-      verbose = true;
-      require('./lib/version').logVersion(argv);
-      break;
-    case 'new':
-      require('./lib/new')(argv);
-      break;
-    case 'help':
-    case undefined:
-      verbose = true;
-      require('./lib/help')(argv);
-      break;
-    default:
-      logger.info(`SKY UX processing command ${command}`);
-      break;
-  }
 
   // Look globally and locally for matching glob pattern
   const dirs = [
@@ -104,6 +82,49 @@ function processArgv(argv) {
       }
     }
   });
+
+  if (modulesCalled.keys === undefined) {
+    fatal(`No module found for ${command}`);
+  }
+}
+
+/**
+ * Processes an argv object.
+ * Reads package.json if it exists.
+ * @name processArgv
+ * @param [Object] argv
+ */
+function processArgv(argv) {
+  let verbose = argv.verbose;
+  let command = argv._[0];
+  // Allow shorthand "-v" for version
+  if (argv.v) {
+    command = 'version';
+  }
+
+  // Allow shorthand "-h" for help
+  if (argv.h) {
+    command = 'help';
+  }
+
+  switch (command) {
+    case 'version':
+      verbose = true;
+      require('./lib/version').logVersion(argv);
+      break;
+    case 'new':
+      require('./lib/new')(argv);
+      break;
+    case 'help':
+    case undefined:
+      verbose = true;
+      require('./lib/help')(argv);
+      break;
+    default:
+      logger.info(`SKY UX processing command ${command}`);
+      invokeCommand(argv);
+      break;
+  }
 
 }
 

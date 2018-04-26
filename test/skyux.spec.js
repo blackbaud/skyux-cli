@@ -6,6 +6,13 @@ const mock = require('mock-require');
 const logger = require('@blackbaud/skyux-logger');
 
 describe('skyux CLI', () => {
+  let spyProcessExit;
+
+  beforeEach(() => {
+    spyProcessExit = spyOn(process, 'exit');
+    spyOn(logger, 'info');
+    spyOn(logger, 'error');
+  })
 
   afterEach(() => {
     mock.stopAll();
@@ -61,230 +68,221 @@ describe('skyux CLI', () => {
     });
   }
 
-  it('should accept known command version', () => {
-    spyOn(glob, 'sync').and.returnValue([]);
+  function cli(options) {
+      let requiredMock = mock.reRequire('../index');
+      requiredMock(options);
+  }
+  function sharedTests() {
+    it('should accept known command version', () => {
+      let called = false;
+      mock('../lib/version', {
+        logVersion: () => {
+          called = true;
+        }
+      });
 
-    let called = false;
-    mock('../lib/version', {
-      logVersion: () => {
+      cli({ _: ['version'] });
+      expect(called).toEqual(true);
+      expect(spyProcessExit).not.toHaveBeenCalled();
+    });
+
+    it('should accept the -v flag', () => {
+      let called = false;
+      mock('../lib/version', {
+        logVersion: () => {
+          called = true;
+        }
+      });
+
+      cli({ _: [''], v: true });
+      expect(called).toEqual(true);
+      expect(spyProcessExit).not.toHaveBeenCalled();
+    });
+
+    it('should accept known command help', () => {
+      let called = false;
+      mock('../lib/help', () => {
         called = true;
-      }
+      });
+
+      cli({ _: ['help'] });
+      expect(called).toEqual(true);
+      expect(spyProcessExit).not.toHaveBeenCalled();
     });
 
-    const cli = mock.reRequire('../index');
-    cli({ _: ['version'] });
-    expect(called).toEqual(true);
-  });
-
-  it('should accept the -v flag', () => {
-    spyOn(glob, 'sync').and.returnValue([]);
-
-    let called = false;
-    mock('../lib/version', {
-      logVersion: () => {
+    it('should accept the -h flag', () => {
+      let called = false;
+      mock('../lib/help', () => {
         called = true;
-      }
+      });
+
+      cli({ _: [''], h: true });
+      expect(called).toEqual(true);
+      expect(spyProcessExit).not.toHaveBeenCalled();
     });
 
-    const cli = mock.reRequire('../index');
-    cli({ _: [''], v: true });
-    expect(called).toEqual(true);
-  });
+    it('should default to the help command', () => {
+      let called = false;
+      mock('../lib/help', () => {
+        called = true;
+      });
 
-  it('should accept known command help', () => {
-    spyOn(glob, 'sync').and.returnValue([]);
-
-    let called = false;
-    mock('../lib/help', () => {
-      called = true;
+      cli({ _: [undefined] });
+      expect(called).toEqual(true);
+      expect(spyProcessExit).not.toHaveBeenCalled();
     });
 
-    const cli = mock.reRequire('../index');
-    cli({ _: ['help'] });
-    expect(called).toEqual(true);
-  });
+    it('should accept known command new', () => {
+      let called = false;
+      mock('../lib/new', () => {
+        called = true;
+      });
 
-  it('should accept the -h flag', () => {
-    spyOn(glob, 'sync').and.returnValue([]);
-
-    let called = false;
-    mock('../lib/help', () => {
-      called = true;
+      cli({ _: ['new'] });
+      expect(called).toEqual(true);
+      expect(spyProcessExit).not.toHaveBeenCalled();
     });
 
-    const cli = mock.reRequire('../index');
-    cli({ _: [''], h: true });
-    expect(called).toEqual(true);
-  });
-
-  it('should default to the help command', () => {
-    spyOn(glob, 'sync').and.returnValue([]);
-
-    let called = false;
-    mock('../lib/help', () => {
-      called = true;
+    it('should accept unknown command', () => {
+      cli({ _: ['unknownCommand'] });
+      expect(logger.info).toHaveBeenCalledWith(`SKY UX processing command unknownCommand`);
+      expect(logger.error).toHaveBeenCalledWith(`No module found for unknownCommand`);
+      expect(spyProcessExit).toHaveBeenCalledWith(1);
     });
 
-    const cli = mock.reRequire('../index');
-    cli({ _: [undefined] });
-    expect(called).toEqual(true);
-  });
+  }
 
-  it('should accept known command new', () => {
-    spyOn(glob, 'sync').and.returnValue([]);
-
-    let called = false;
-    mock('../lib/new', () => {
-      called = true;
+  describe('when missing modules', () => {
+    beforeEach(() => {
+      spyOn(glob, 'sync').and.returnValue([]);
     });
 
-    const cli = mock.reRequire('../index');
-    cli({ _: ['new'] });
-    expect(called).toEqual(true);
-  });
-
-  it('should accept unknown command', () => {
-    spyOn(glob, 'sync').and.returnValue([]);
-    spyOn(logger, 'info');
-
-    const cli = mock.reRequire('../index');
-    cli({ _: ['unknownCommand'] });
-    expect(logger.info).toHaveBeenCalledWith(`SKY UX processing command unknownCommand`);
-  });
-
-  it('should look globally and locally for matching glob patterns', () => {
-    spyOn(logger, 'info');
-    setupMock();
-    const customCommand = 'customCommand';
-
-    mock('local-module', {
-      runCommand: (cmd) => {
-        expect(cmd).toBe(customCommand);
-      }
+    it('should fail and log an error', () => {
+      cli({ _: ['serve'] });
+      expect(logger.info).toHaveBeenCalledWith(`SKY UX processing command serve`);
+      expect(logger.error).toHaveBeenCalledWith(`No files found for glob /skyux-builder*/package.json. Have you ran "npm install"?`);
+      expect(spyProcessExit).toHaveBeenCalledWith(1);
     });
 
-    mock('non-scoped-global-module', {
-      runCommand: (cmd) => {
-        expect(cmd).toBe(customCommand);
-      }
-    });
-
-    mock('scoped-global-module', {
-      runCommand: (cmd) => {
-        expect(cmd).toBe(customCommand);
-      }
-    });
-
-    const cli = mock.reRequire('../index');
-    cli({ _: [customCommand], verbose: true });
-    expect(logger.info).toHaveBeenCalledWith(`Passing command to local-module-name`);
-    expect(logger.info).toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
-    expect(logger.info).toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
-  });
-
-  it('should handle an error when requiring a malformed module and log when verbose', () => {
-    setupMock();
-    const customCommand = 'customCommand';
-
-    // not mocking global modules to simulate error
-    mock('local-module', {
-      runCommand: (cmd) => {
-        expect(cmd).toBe(customCommand);
-      }
-    });
-
-    spyOn(logger, 'info');
-
-    const cli = mock.reRequire('../index');
-    cli({ _: [customCommand], verbose: true });
-
-    expect(logger.info).toHaveBeenCalledWith(
-      `Error loading module: non-scoped-global-module/package.json`
-    );
+    sharedTests();
 
   });
 
-  it('should handle an error when requiring a malformed module and not log when not verbose', () => {
-    setupMock();
-    const customCommand = 'customCommand';
-
-    // not mocking global modules to simulate error
-    mock('local-module', {
-      runCommand: (cmd) => {
-        expect(cmd).toBe(customCommand);
-      }
+  describe('when containing modules', () => {
+    beforeEach(() => {
+      setupMock();
     });
 
-    spyOn(logger, 'info');
+    it('should look globally and locally for matching glob patterns', () => {
+      const customCommand = 'customCommand';
 
-    const cli = mock.reRequire('../index');
-    cli({ _: [customCommand] });
+      mock('local-module', {
+        runCommand: (cmd) => {
+          expect(cmd).toBe(customCommand);
+        }
+      });
 
-    expect(logger.info).not.toHaveBeenCalledWith(
-      `Error loading module: non-scoped-global-module/package.json`
-    );
+      mock('non-scoped-global-module', {
+        runCommand: (cmd) => {
+          expect(cmd).toBe(customCommand);
+        }
+      });
 
+      mock('scoped-global-module', {
+        runCommand: (cmd) => {
+          expect(cmd).toBe(customCommand);
+        }
+      });
+
+      cli({ _: [customCommand], verbose: true });
+      expect(logger.info).toHaveBeenCalledWith(`Passing command to local-module-name`);
+      expect(logger.info).toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
+      expect(logger.info).toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
+    });
+
+    it('should handle an error when requiring a malformed module and log when verbose', () => {
+      const customCommand = 'customCommand';
+
+      // not mocking global modules to simulate error
+      mock('local-module', {
+        runCommand: (cmd) => {
+          expect(cmd).toBe(customCommand);
+        }
+      });
+
+      cli({ _: [customCommand], verbose: true });
+
+      expect(logger.info).toHaveBeenCalledWith(
+        `Error loading module: non-scoped-global-module/package.json`
+      );
+
+    });
+
+    it('should handle an error when requiring a malformed module and not log when not verbose', () => {
+      const customCommand = 'customCommand';
+
+      // not mocking global modules to simulate error
+      mock('local-module', {
+        runCommand: (cmd) => {
+          expect(cmd).toBe(customCommand);
+        }
+      });
+
+      cli({ _: [customCommand] });
+
+      expect(logger.info).not.toHaveBeenCalledWith(
+        `Error loading module: non-scoped-global-module/package.json`
+      );
+
+    });
+
+    sharedTests()
   });
 
-  it('should log path if name property does not exist in package.json when verbose', () => {
-    spyOn(logger, 'info');
-    setupMock(true);
+  describe('when containing modules but no name property in package.json', () => {
 
-    mock('local-module', {
-      runCommand: () => {}
+    beforeEach(() => {
+      setupMock(true);
+      mock('local-module', {
+        runCommand: () => {}
+      });
+
+      mock('non-scoped-global-module', {
+        runCommand: () => {}
+      });
+
+      mock('scoped-global-module', {
+        runCommand: () => {}
+      });
+    })
+
+    it('should log path when verbose', () => {
+      cli({ _: ['customCommand'], verbose: true });
+
+      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to local-module-name`);
+      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
+      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
+      expect(logger.info).toHaveBeenCalledWith(`Passing command to local-module`);
+      expect(logger.info).toHaveBeenCalledWith(`Passing command to non-scoped-global-module`);
+      expect(logger.info).toHaveBeenCalledWith(`Passing command to scoped-global-module`);
     });
 
-    mock('non-scoped-global-module', {
-      runCommand: () => {}
+    it('should not log path or name property when not vebose', () => {
+      cli({ _: ['customCommand'] });
+
+      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to local-module-name`);
+      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
+      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
+      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to local-module`);
+      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to non-scoped-global-module`);
+      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to scoped-global-module`);
     });
 
-    mock('scoped-global-module', {
-      runCommand: () => {}
-    });
-
-    const cli = mock.reRequire('../index');
-    cli({ _: ['customCommand'], verbose: true });
-
-    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to local-module-name`);
-    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
-    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
-    expect(logger.info).toHaveBeenCalledWith(`Passing command to local-module`);
-    expect(logger.info).toHaveBeenCalledWith(`Passing command to non-scoped-global-module`);
-    expect(logger.info).toHaveBeenCalledWith(`Passing command to scoped-global-module`);
-  });
-
-  it('should not log path or name property when not vebose', () => {
-    spyOn(logger, 'info');
-    setupMock(true);
-
-    mock('local-module', {
-      runCommand: () => {}
-    });
-
-    mock('non-scoped-global-module', {
-      runCommand: () => {}
-    });
-
-    mock('scoped-global-module', {
-      runCommand: () => {}
-    });
-
-    const cli = mock.reRequire('../index');
-    cli({ _: ['customCommand'] });
-
-    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to local-module-name`);
-    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
-    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
-    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to local-module`);
-    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to non-scoped-global-module`);
-    expect(logger.info).not.toHaveBeenCalledWith(`Passing command to scoped-global-module`);
   });
 
   it('should not call the same package more than once', () => {
-
     const cwd = 'current-working-directory';
     spyOn(process, 'cwd').and.returnValue(cwd);
-    spyOn(logger, 'info');
 
     mock('path', {
       dirname: (dir) => dir.replace('/package.json', ''),
@@ -324,7 +322,6 @@ describe('skyux CLI', () => {
       }
     });
 
-    const cli = mock.reRequire('../index');
     cli({ _: ['customCommand'], verbose: true });
 
     expect(logger.info).toHaveBeenCalledWith(`Passing command to duplicate-module-name`);
