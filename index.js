@@ -45,6 +45,11 @@ function fatal(msg) {
   process.exit(1);
 }
 
+/**
+ * search for a command in the modules and invoke it if found. If not found,
+ * log a fatal error.
+ * @param [Object] argv
+ */
 function invokeCommand(argv) {
   let verbose = argv.verbose;
   let command = argv._[0];
