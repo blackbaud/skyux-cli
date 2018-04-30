@@ -83,7 +83,7 @@ function invokeCommand(argv) {
     }
   });
 
-  if (modulesCalled.keys === undefined) {
+  if (Object.keys(modulesCalled).length === 0) {
     fatal(`No module found for ${command}`);
   }
 }
@@ -95,7 +95,6 @@ function invokeCommand(argv) {
  * @param [Object] argv
  */
 function processArgv(argv) {
-  let verbose = argv.verbose;
   let command = argv._[0];
   // Allow shorthand "-v" for version
   if (argv.v) {
@@ -109,7 +108,6 @@ function processArgv(argv) {
 
   switch (command) {
     case 'version':
-      verbose = true;
       require('./lib/version').logVersion(argv);
       break;
     case 'new':
@@ -117,7 +115,6 @@ function processArgv(argv) {
       break;
     case 'help':
     case undefined:
-      verbose = true;
       require('./lib/help')(argv);
       break;
     default:
