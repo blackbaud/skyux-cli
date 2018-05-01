@@ -10,7 +10,7 @@ describe('skyux CLI', () => {
 
   beforeEach(() => {
     spyProcessExit = spyOn(process, 'exit');
-    spyOn(logger, 'info');
+    spyOn(logger, 'verbose');
     spyOn(logger, 'error');
   })
 
@@ -145,7 +145,7 @@ describe('skyux CLI', () => {
 
     it('should accept unknown command', () => {
       cli({ _: ['unknownCommand'] });
-      expect(logger.info).toHaveBeenCalledWith(`SKY UX processing command unknownCommand`);
+      expect(logger.verbose).toHaveBeenCalledWith(`SKY UX processing command unknownCommand`);
       expect(logger.error).toHaveBeenCalledWith(`No module found for unknownCommand`);
       expect(spyProcessExit).toHaveBeenCalledWith(1);
     });
@@ -159,7 +159,7 @@ describe('skyux CLI', () => {
 
     it('should fail and log an error', () => {
       cli({ _: ['serve'] });
-      expect(logger.info).toHaveBeenCalledWith(`SKY UX processing command serve`);
+      expect(logger.verbose).toHaveBeenCalledWith(`SKY UX processing command serve`);
       expect(logger.error).toHaveBeenCalledWith(`No files found for glob /skyux-builder*/package.json. Have you ran "npm install"?`);
       expect(spyProcessExit).toHaveBeenCalledWith(1);
     });
@@ -194,31 +194,13 @@ describe('skyux CLI', () => {
         }
       });
 
-      cli({ _: [customCommand], verbose: true });
-      expect(logger.info).toHaveBeenCalledWith(`Passing command to local-module-name`);
-      expect(logger.info).toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
-      expect(logger.info).toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
+      cli({ _: [customCommand] });
+      expect(logger.verbose).toHaveBeenCalledWith(`Passing command to local-module-name`);
+      expect(logger.verbose).toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
+      expect(logger.verbose).toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
     });
 
-    it('should handle an error when requiring a malformed module and log when verbose', () => {
-      const customCommand = 'customCommand';
-
-      // not mocking global modules to simulate error
-      mock('local-module', {
-        runCommand: (cmd) => {
-          expect(cmd).toBe(customCommand);
-        }
-      });
-
-      cli({ _: [customCommand], verbose: true });
-
-      expect(logger.info).toHaveBeenCalledWith(
-        `Error loading module: non-scoped-global-module/package.json`
-      );
-
-    });
-
-    it('should handle an error when requiring a malformed module and not log when not verbose', () => {
+    it('should handle an error when requiring a malformed module', () => {
       const customCommand = 'customCommand';
 
       // not mocking global modules to simulate error
@@ -230,7 +212,7 @@ describe('skyux CLI', () => {
 
       cli({ _: [customCommand] });
 
-      expect(logger.info).not.toHaveBeenCalledWith(
+      expect(logger.verbose).toHaveBeenCalledWith(
         `Error loading module: non-scoped-global-module/package.json`
       );
 
@@ -256,26 +238,15 @@ describe('skyux CLI', () => {
       });
     })
 
-    it('should log path when verbose', () => {
-      cli({ _: ['customCommand'], verbose: true });
-
-      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to local-module-name`);
-      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
-      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
-      expect(logger.info).toHaveBeenCalledWith(`Passing command to local-module`);
-      expect(logger.info).toHaveBeenCalledWith(`Passing command to non-scoped-global-module`);
-      expect(logger.info).toHaveBeenCalledWith(`Passing command to scoped-global-module`);
-    });
-
-    it('should not log path or name property when not vebose', () => {
+    it('should log path', () => {
       cli({ _: ['customCommand'] });
 
-      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to local-module-name`);
-      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
-      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
-      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to local-module`);
-      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to non-scoped-global-module`);
-      expect(logger.info).not.toHaveBeenCalledWith(`Passing command to scoped-global-module`);
+      expect(logger.verbose).not.toHaveBeenCalledWith(`Passing command to local-module-name`);
+      expect(logger.verbose).not.toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
+      expect(logger.verbose).not.toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
+      expect(logger.verbose).toHaveBeenCalledWith(`Passing command to local-module`);
+      expect(logger.verbose).toHaveBeenCalledWith(`Passing command to non-scoped-global-module`);
+      expect(logger.verbose).toHaveBeenCalledWith(`Passing command to scoped-global-module`);
     });
 
   });
@@ -322,10 +293,10 @@ describe('skyux CLI', () => {
       }
     });
 
-    cli({ _: ['customCommand'], verbose: true });
+    cli({ _: ['customCommand'] });
 
-    expect(logger.info).toHaveBeenCalledWith(`Passing command to duplicate-module-name`);
-    expect(logger.info).toHaveBeenCalledWith(`Multiple instances found. Skipping passing command to duplicate-module-name`);
+    expect(logger.verbose).toHaveBeenCalledWith(`Passing command to duplicate-module-name`);
+    expect(logger.verbose).toHaveBeenCalledWith(`Multiple instances found. Skipping passing command to duplicate-module-name`);
   });
 
 });

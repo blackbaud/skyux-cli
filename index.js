@@ -26,17 +26,6 @@ function getGlobs(dirs) {
 }
 
 /**
- * Only log a message if verbose is enabled.
- * @param {boolean} verbose
- * @param {string} msg
- */
-function log(isVerbose, msg) {
-  if (isVerbose) {
-    logger.info(msg);
-  }
-}
-
-/**
  * Log fatal error and exit
  * @param {string} msg
  */
@@ -51,7 +40,6 @@ function fatal(msg) {
  * @param [Object] argv
  */
 function invokeCommand(argv) {
-  let verbose = argv.verbose;
   let command = argv._[0];
 
   // Look globally and locally for matching glob pattern
@@ -72,16 +60,16 @@ function invokeCommand(argv) {
       module = require(dirName);
       pkgJson = require(pkg);
     } catch (err) {
-      log(verbose, `Error loading module: ${pkg}`);
+      logger.verbose(`Error loading module: ${pkg}`);
     }
 
     if (module && typeof module.runCommand === 'function') {
       const pkgName = pkgJson.name || dirName;
 
       if (modulesCalled[pkgName]) {
-        log(verbose, `Multiple instances found. Skipping passing command to ${pkgName}`);
+        logger.verbose(`Multiple instances found. Skipping passing command to ${pkgName}`);
       } else {
-        log(verbose, `Passing command to ${pkgName}`);
+        logger.verbose(`Passing command to ${pkgName}`);
         module.runCommand(command, argv);
         modulesCalled[pkgName] = true;
       }
@@ -123,7 +111,7 @@ function processArgv(argv) {
       require('./lib/help')(argv);
       break;
     default:
-      logger.info(`SKY UX processing command ${command}`);
+      logger.verbose(`SKY UX processing command ${command}`);
       invokeCommand(argv);
       break;
   }
