@@ -11,6 +11,7 @@ describe('skyux CLI', () => {
   beforeEach(() => {
     spyProcessExit = spyOn(process, 'exit');
     spyOn(logger, 'verbose');
+    spyOn(logger, 'info');
     spyOn(logger, 'error');
   })
 
@@ -145,7 +146,7 @@ describe('skyux CLI', () => {
 
     it('should accept unknown command', () => {
       cli({ _: ['unknownCommand'] });
-      expect(logger.verbose).toHaveBeenCalledWith(`SKY UX processing command unknownCommand`);
+      expect(logger.info).toHaveBeenCalledWith(`SKY UX processing command unknownCommand`);
       expect(logger.error).toHaveBeenCalledWith(`No module found for unknownCommand`);
       expect(spyProcessExit).toHaveBeenCalledWith(1);
     });
@@ -159,7 +160,7 @@ describe('skyux CLI', () => {
 
     it('should fail and log an error', () => {
       cli({ _: ['serve'] });
-      expect(logger.verbose).toHaveBeenCalledWith(`SKY UX processing command serve`);
+      expect(logger.info).toHaveBeenCalledWith(`SKY UX processing command serve`);
       expect(logger.error).toHaveBeenCalledWith(`No files found for glob /skyux-builder*/package.json. Have you ran "npm install"?`);
       expect(spyProcessExit).toHaveBeenCalledWith(1);
     });

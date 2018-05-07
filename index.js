@@ -111,7 +111,7 @@ function processArgv(argv) {
       require('./lib/help')(argv);
       break;
     default:
-      logger.verbose(`SKY UX processing command ${command}`);
+      logger.info(`SKY UX processing command ${command}`);
       invokeCommand(argv);
       break;
   }
