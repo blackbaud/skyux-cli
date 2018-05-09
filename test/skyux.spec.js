@@ -180,18 +180,26 @@ describe('skyux CLI', () => {
       mock('local-module', {
         runCommand: (cmd) => {
           expect(cmd).toBe(customCommand);
+
+          // command answered
+          return true;
         }
       });
 
       mock('non-scoped-global-module', {
         runCommand: (cmd) => {
           expect(cmd).toBe(customCommand);
+
+          // unknown command
+          return false;
         }
       });
 
       mock('scoped-global-module', {
         runCommand: (cmd) => {
           expect(cmd).toBe(customCommand);
+
+          // No return (simulating backwards compatability)
         }
       });
 
@@ -199,6 +207,21 @@ describe('skyux CLI', () => {
       expect(logger.verbose).toHaveBeenCalledWith(`Passing command to local-module-name`);
       expect(logger.verbose).toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
       expect(logger.verbose).toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
+      expect(logger.verbose).toHaveBeenCalledWith(`Successfully passed ${customCommand} to 1 module(s).`)
+    });
+
+    it('should fail and log an error if modules found but unknown command (none return true)', () => {
+      const customCommand = 'customCommand';
+
+      mock('local-module', {
+        runCommand: (cmd) => {
+          expect(cmd).toBe(customCommand);
+          return false;
+        }
+      });
+
+      cli({ _: [customCommand] });
+      expect(logger.error).toHaveBeenCalledWith(`No module found for ${customCommand}`);
     });
 
     it('should handle an error when requiring a malformed module', () => {

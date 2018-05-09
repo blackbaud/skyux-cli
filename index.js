@@ -50,6 +50,7 @@ function invokeCommand(argv) {
   ];
 
   let modulesCalled = {};
+  let modulesAnswered = [];
 
   getGlobs(dirs).forEach(pkg => {
     const dirName = path.dirname(pkg);
@@ -70,14 +71,20 @@ function invokeCommand(argv) {
         logger.verbose(`Multiple instances found. Skipping passing command to ${pkgName}`);
       } else {
         logger.verbose(`Passing command to ${pkgName}`);
-        module.runCommand(command, argv);
+
         modulesCalled[pkgName] = true;
+        if (module.runCommand(command, argv)) {
+          modulesAnswered.push(pkgName);
+        }
+
       }
     }
   });
 
-  if (Object.keys(modulesCalled).length === 0) {
+  if (modulesAnswered.length === 0) {
     fatal(`No module found for ${command}`);
+  } else {
+    logger.verbose(`Successfully passed ${command} to ${modulesAnswered.length} module(s).`);
   }
 }
 
