@@ -81,10 +81,16 @@ function invokeCommand(argv) {
     }
   });
 
+  const modulesAnsweredLength = modulesAnswered.length;
+  const modulesAnsweredPlural = modulesAnsweredLength === 1 ? 'module' : 'modules';
+
   if (modulesAnswered.length === 0) {
     fatal(`No module found for ${command}`);
   } else {
-    logger.verbose(`Successfully passed ${command} to ${modulesAnswered.length} module(s).`);
+    logger.verbose(
+      `Successfully passed ${command} to ${modulesAnsweredLength} ${modulesAnsweredPlural}:`
+    );
+    logger.verbose(modulesAnswered.join(', '));
   }
 }
 

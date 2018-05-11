@@ -190,7 +190,45 @@ describe('skyux CLI', () => {
         runCommand: (cmd) => {
           expect(cmd).toBe(customCommand);
 
-          // unknown command
+          // command answered
+          return true;
+        }
+      });
+
+      mock('scoped-global-module', {
+        runCommand: (cmd) => {
+          expect(cmd).toBe(customCommand);
+
+          // command unanswered
+          return false;
+        }
+      });
+
+      cli({ _: [customCommand] });
+      expect(logger.verbose).toHaveBeenCalledWith(`Passing command to local-module-name`);
+      expect(logger.verbose).toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
+      expect(logger.verbose).toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
+      expect(logger.verbose).toHaveBeenCalledWith(`Successfully passed ${customCommand} to 2 modules:`)
+      expect(logger.verbose).toHaveBeenCalledWith(`local-module-name, non-scoped-global-module-name`);
+    });
+
+    it('should verbosely log the correct plural form of "module"', () => {
+      const customCommand = 'customCommand';
+
+      mock('local-module', {
+        runCommand: (cmd) => {
+          expect(cmd).toBe(customCommand);
+
+          // command answered
+          return true;
+        }
+      });
+
+      mock('non-scoped-global-module', {
+        runCommand: (cmd) => {
+          expect(cmd).toBe(customCommand);
+
+          // command answered
           return false;
         }
       });
@@ -199,7 +237,7 @@ describe('skyux CLI', () => {
         runCommand: (cmd) => {
           expect(cmd).toBe(customCommand);
 
-          // No return (simulating backwards compatability)
+          // No return value
         }
       });
 
@@ -207,7 +245,8 @@ describe('skyux CLI', () => {
       expect(logger.verbose).toHaveBeenCalledWith(`Passing command to local-module-name`);
       expect(logger.verbose).toHaveBeenCalledWith(`Passing command to non-scoped-global-module-name`);
       expect(logger.verbose).toHaveBeenCalledWith(`Passing command to scoped-global-module-name`);
-      expect(logger.verbose).toHaveBeenCalledWith(`Successfully passed ${customCommand} to 1 module(s).`)
+      expect(logger.verbose).toHaveBeenCalledWith(`Successfully passed ${customCommand} to 1 module:`)
+      expect(logger.verbose).toHaveBeenCalledWith(`local-module-name`);
     });
 
     it('should fail and log an error if modules found but unknown command (none return true)', () => {
