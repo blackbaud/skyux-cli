@@ -1,3 +1,8 @@
+# 1.4.0 (2018-05-11)
+
+- Updated verbose logging capabilities. [#151](https://github.com/blackbaud/skyux-cli/pull/151)
+- Update to log an error and exit when no modules are found for a given command. [#150](https://github.com/blackbaud/skyux-cli/pull/150) Thanks [@Blackbaud-ColbyWhite](https://github.com/Blackbaud-ColbyWhite)!
+
 # 1.3.0 (2018-03-16)
 
 - Migrated all logging to use the `@blackbaud/skyux-logger` package. [#145](https://github.com/blackbaud/skyux-builder/pull/145)
