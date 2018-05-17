@@ -1,6 +1,7 @@
 /*jshint jasmine: true, node: true */
 'use strict';
 
+const fs = require('fs');
 const glob = require('glob');
 const mock = require('mock-require');
 const logger = require('@blackbaud/skyux-logger');
@@ -19,8 +20,8 @@ describe('skyux CLI', () => {
     mock.stopAll();
   });
 
-  function setupMock(noNameProperty) {
-    const cwd = 'current-working-directory';
+  function setupMock(noNameProperty, cwd) {
+    cwd = cwd || 'current-working-directory';
     spyOn(process, 'cwd').and.returnValue(cwd);
 
     mock('path', {
@@ -73,6 +74,7 @@ describe('skyux CLI', () => {
       let requiredMock = mock.reRequire('../index');
       requiredMock(options);
   }
+
   function sharedTests() {
     it('should accept known command version', () => {
       let called = false;
@@ -147,10 +149,9 @@ describe('skyux CLI', () => {
     it('should accept unknown command', () => {
       cli({ _: ['unknownCommand'] });
       expect(logger.info).toHaveBeenCalledWith(`SKY UX processing command unknownCommand`);
-      expect(logger.error).toHaveBeenCalledWith(`No module found for unknownCommand`);
+      expect(logger.error).toHaveBeenCalledWith(`No modules found for unknownCommand`);
       expect(spyProcessExit).toHaveBeenCalledWith(1);
     });
-
   }
 
   describe('when missing modules', () => {
@@ -161,9 +162,33 @@ describe('skyux CLI', () => {
     it('should fail and log an error', () => {
       cli({ _: ['serve'] });
       expect(logger.info).toHaveBeenCalledWith(`SKY UX processing command serve`);
-      expect(logger.error).toHaveBeenCalledWith(`No files found for glob /skyux-builder*/package.json. Have you ran "npm install"?`);
+      expect(logger.error).toHaveBeenCalledWith(`No modules found for serve`);
       expect(spyProcessExit).toHaveBeenCalledWith(1);
     });
+
+    it('should log an error if no modules and path does not contain "skyux-spa"', () => {
+      spyOn(process, 'cwd').and.returnValue('non-spa-dir');
+
+      cli({ _: ['unknownCommand'] });
+      expect(logger.error).toHaveBeenCalledWith(`Are you in a SKY UX SPA directory?`);
+    });
+
+    it('should log an error if path contains "skyux-spa" but the "node_modules" dir does not exist', () => {
+      spyOn(process, 'cwd').and.returnValue('skyux-spa-dir');
+      spyOn(fs, 'existsSync').and.returnValue(false);
+
+      cli({ _: ['unknownCommand'] });
+      expect(logger.error).toHaveBeenCalledWith(`Have you ran 'npm install'?`);
+    });
+
+    it('should not log an special errors if in skyux-spa dir and node_modules exists', () => {
+      spyOn(process, 'cwd').and.returnValue('skyux-spa-dir');
+      spyOn(fs, 'existsSync').and.returnValue(true);
+
+      cli({ _: ['unknownCommand'] });
+      expect(logger.error).not.toHaveBeenCalledWith(`Are you in a SKY UX SPA directory?`);
+      expect(logger.error).not.toHaveBeenCalledWith(`Have you ran 'npm install'?`);
+    })
 
     sharedTests();
 
@@ -260,7 +285,7 @@ describe('skyux CLI', () => {
       });
 
       cli({ _: [customCommand] });
-      expect(logger.error).toHaveBeenCalledWith(`No module found for ${customCommand}`);
+      expect(logger.error).toHaveBeenCalledWith(`No modules found for ${customCommand}`);
     });
 
     it('should handle an error when requiring a malformed module', () => {
