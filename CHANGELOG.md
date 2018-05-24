@@ -1,3 +1,7 @@
+# 1.4.1 (2018-05-25)
+
+- Bugfix to correctly pass all commands to modules. [#153](https://github.com/blackbaud/skyux-cli/pull/153)
+
 # 1.4.0 (2018-05-11)
 
 - Updated verbose logging capabilities. [#151](https://github.com/blackbaud/skyux-cli/pull/151)
