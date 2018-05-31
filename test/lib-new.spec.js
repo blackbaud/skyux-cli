@@ -421,4 +421,34 @@ describe('skyux new command', () => {
     });
   });
 
+  it('should setup appropriate package.json versions for libraries', (done) => {
+    spyOn(fs, 'existsSync').and.returnValue(false);
+    spyOn(fs, 'readdirSync').and.returnValue([
+      '.git',
+      'README.md',
+      '.gitignore'
+    ]);
+    spyOn(fs, 'readJsonSync').and.returnValue({});
+    let spyWriteJson = spyOn(fs, 'writeJsonSync');
+    spyOn(fs, 'removeSync');
+    spyOn(fs, 'copySync');
+
+    mock.reRequire('../lib/new')({
+      t: 'library'
+    });
+
+    // Don't provide current repo URL to clone
+    sendLine('some-spa-name', () => {
+      sendLine('', () => {
+        emitter.on('spawnCalled', () => {
+          const json = spyWriteJson.calls.mostRecent().args[1];
+          expect(json.dependencies['@blackbaud/skyux']).toBeUndefined();
+          expect(json.devDependencies['@blackbaud/skyux']).toEqual(`@blackbaud/skyux-LATEST`);
+          expect(json.devDependencies['@blackbaud/skyux-builder']).toEqual(`@blackbaud/skyux-builder-LATEST`);
+          expect(json.peerDependencies['@blackbaud/skyux']).toEqual(`^@blackbaud/skyux-LATEST`);
+          done();
+        });
+      });
+    });
+  });
 });
