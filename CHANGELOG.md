@@ -1,6 +1,6 @@
 # 1.5.0 (2018-05-31)
 
-- New libraries are created using a different dependency structure than SPAs. [#155](https://github.com/blackbaud/skyux-cli/pull/155)
+- New libraries are now created with a different dependency structure than SPAs. [#155](https://github.com/blackbaud/skyux-cli/pull/155)
 
 # 1.4.1 (2018-05-25)
 
