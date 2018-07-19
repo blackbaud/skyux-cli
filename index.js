@@ -22,7 +22,8 @@ function getGlobs() {
   let globs = [];
 
   dirs.forEach(dir => {
-    const joined = path.join(dir, '/builder*/package.json');
+    let joined = path.join(dir, '/skyux-builder*/package.json');
+    joined = joined.concat(path.join(dir, '/builder*/package.json'));
 
     logger.verbose(`Looking for modules in ${joined}`);
     globs = globs.concat(glob.sync(joined));
