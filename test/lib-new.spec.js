@@ -406,8 +406,8 @@ describe('skyux new command', () => {
         emitter.on('spawnCalled', () => {
           const json = spyWriteJson.calls.mostRecent().args[1];
           const deps = {
-            '@skyux/core': 'dependencies',
-            '@skyux-sdk/builder': 'devDependencies'
+            '@blackbaud/skyux': 'dependencies',
+            '@blackbaud/skyux-builder': 'devDependencies'
           };
 
           Object.keys(deps).forEach(key => {

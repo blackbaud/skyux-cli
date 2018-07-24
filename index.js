@@ -22,6 +22,7 @@ function getGlobs() {
   let globs = [];
 
   dirs.forEach(dir => {
+    console.log('dir?', dir);
     globs = globs.concat(
       glob.sync(path.join(dir, '/skyux-builder*/package.json'))
     ).concat(
