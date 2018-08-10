@@ -4,6 +4,7 @@
 const fs = require('fs-extra');
 const mock = require('mock-require');
 const EventEmitter = require('events').EventEmitter;
+const ora = require('ora');
 
 let emitter;
 
@@ -18,10 +19,22 @@ let customError = '';
 let versionsRequested;
 let logger;
 let spyWrite;
+let spyOraFail;
+let spyOraSucceed;
 
 describe('skyux new command', () => {
 
   beforeEach(() => {
+
+    spyOraFail = jasmine.createSpy('fail');
+    spyOraSucceed = jasmine.createSpy('succeed');
+
+    mock('ora', () => ({
+      start: () => ({
+        succeed: spyOraSucceed,
+        fail: spyOraFail
+      })
+    }));
 
     logger = jasmine.createSpyObj(
       'logger',
@@ -85,8 +98,15 @@ describe('skyux new command', () => {
     });
   });
 
-  it('should use the template flag as a GitHub repo name if it does not contain a colon', (done) => {
+  // Cloning the template is a perfect scenario to test the entire custom logger setup.
+  // It has info, error messages, and success messages.
+  function cloneTest(isVerbose, cb) {
     spyOnPrompt();
+
+    if (isVerbose) {
+      logger.logLevel = 'verbose';
+    }
+
     const customTemplateName = 'valid-template-name';
     const skyuxNew = mock.reRequire('../lib/new')({
       template: customTemplateName
@@ -94,13 +114,55 @@ describe('skyux new command', () => {
 
     sendLine('some-spa-name', () => {
       sendLine('', () => {
-        skyuxNew.then(() => {
-          expect(logger.info).toHaveBeenCalledWith(
-            `${customTemplateName} template successfully cloned.`
-          );
-          done();
-        });
+        skyuxNew.then(() => cb(customTemplateName));
       });
+    });
+  }
+
+  it('should use the template flag as a GitHub repo name if it does not contain a colon (regular)', (done) => {
+    const spyOraSucceed = jasmine.createSpy('succeed');
+    mock('ora', () => ({
+      start: () => ({
+        succeed: spyOraSucceed
+      })
+    }));
+
+    cloneTest(false, (customTemplateName) => {
+      expect(spyOraSucceed).toHaveBeenCalledWith(
+        `${customTemplateName} template successfully cloned.`
+      );
+      done();
+    });
+  });
+
+  it('should use the template flag as a GitHub repo name if it does not contain a colon (verbose)', (done) => {
+    cloneTest(true, (customTemplateName) => {
+      expect(logger.info).toHaveBeenCalledWith(
+        `${customTemplateName} template successfully cloned.`
+      );
+      done();
+    });
+  });
+
+  it('should handle an error cloning a custom template (regular)', (done) => {
+    customError = 'TEMPLATE_ERROR_2';
+    spyOn(fs, 'existsSync').and.returnValue(false);
+
+    cloneTest(false, () => {
+      expect(spyOraFail).toHaveBeenCalledWith(
+        'Template not found at location, https://github.com/blackbaud/skyux-template-valid-template-name.'
+      );
+      done();
+    });
+  });
+
+  it('should handle an error cloning a custom template (verbose)', (done) => {
+    customError = 'TEMPLATE_ERROR_2';
+    spyOn(fs, 'existsSync').and.returnValue(false);
+
+    cloneTest(true, () => {
+      expect(logger.error).toHaveBeenCalledWith(customError);
+      done();
     });
   });
 
@@ -113,7 +175,7 @@ describe('skyux new command', () => {
     sendLine('some-spa-name', () => {
       sendLine('', () => {
         skyuxNew.then(() => {
-          expect(logger.info).toHaveBeenCalledWith(
+          expect(spyOraSucceed).toHaveBeenCalledWith(
             `${customTemplateName} template successfully cloned.`
           );
           done();
@@ -147,7 +209,7 @@ describe('skyux new command', () => {
     sendLine('some-spa-name', () => {
       sendLine('', () => {
         skyuxNew.then(() => {
-          expect(logger.info).toHaveBeenCalledWith('default template successfully cloned.');
+          expect(spyOraSucceed).toHaveBeenCalledWith('default template successfully cloned.');
           done();
         });
       });
@@ -160,7 +222,7 @@ describe('skyux new command', () => {
     sendLine('some-spa-name', () => {
       sendLine('', () => {
         skyuxNew.then(() => {
-          expect(logger.info).toHaveBeenCalledWith('default template successfully cloned.');
+          expect(spyOraSucceed).toHaveBeenCalledWith('default template successfully cloned.');
           done();
         });
       });
@@ -194,22 +256,6 @@ describe('skyux new command', () => {
       sendLine('', () => {
         skyuxNew.then(() => {
           expect(logger.error).toHaveBeenCalledWith('TEMPLATE_ERROR_1');
-          done();
-        });
-      });
-    });
-  });
-
-  it('should handle an error cloning a custom template', (done) => {
-    customError = 'TEMPLATE_ERROR_2';
-    spyOn(fs, 'existsSync').and.returnValue(false);
-    const skyuxNew = mock.reRequire('../lib/new')({
-      t: 'invalid-template-name'
-    });
-    sendLine('some-spa-name', () => {
-      sendLine('', () => {
-        skyuxNew.then(() => {
-          expect(logger.error).toHaveBeenCalledWith('TEMPLATE_ERROR_2');
           done();
         });
       });
@@ -251,7 +297,7 @@ describe('skyux new command', () => {
     });
   });
 
-  it('should ignore .git and README.md files when cloning and run npm install', (done) => {
+  it('should ignore .git and README.md files when cloning and run npm install (verbose)', (done) => {
     spyOn(fs, 'existsSync').and.returnValue(false);
     spyOn(fs, 'readdirSync').and.returnValue([
       '.git',
@@ -266,13 +312,15 @@ describe('skyux new command', () => {
     const skyuxNew = mock.reRequire('../lib/new')();
     let spawnCalledCount = 0;
 
+    logger.logLevel = 'verbose';
+
     sendLine('some-spa-name', () => {
       sendLine('some-spa-repo', () => {
         emitter.on('spawnCalled', () => {
 
           if (spawnCalledCount === 1) {
             skyuxNew.then(() => {
-              expect(logger.info).toHaveBeenCalledWith('Running npm install');
+              expect(logger.info).toHaveBeenCalledWith('Running npm install (can take several minutes)');
               expect(logger.info).toHaveBeenCalledWith(
                 'Change into that directory and run "skyux serve" to begin.'
               );
@@ -290,7 +338,7 @@ describe('skyux new command', () => {
     });
   });
 
-  it('should handle errors when running git checkout', (done) => {
+  it('should handle errors when running git checkout (verbose)', (done) => {
     spyOn(fs, 'existsSync').and.returnValue(false);
     spyOn(fs, 'readdirSync').and.returnValue([
       '.git',
@@ -302,6 +350,7 @@ describe('skyux new command', () => {
     spyOn(fs, 'removeSync');
     spyOn(fs, 'copySync');
 
+    logger.logLevel = 'verbose';
     const skyuxNew = mock.reRequire('../lib/new')();
 
     sendLine('some-spa-name', () => {
