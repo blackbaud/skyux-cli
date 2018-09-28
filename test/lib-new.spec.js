@@ -21,11 +21,13 @@ let logger;
 let spyWrite;
 let spyOraFail;
 let spyOraSucceed;
+let gitCloneUrl;
 
 describe('skyux new command', () => {
 
   beforeEach(() => {
 
+    gitCloneUrl = undefined;
     spyOraFail = jasmine.createSpy('fail');
     spyOraSucceed = jasmine.createSpy('succeed');
 
@@ -49,6 +51,7 @@ describe('skyux new command', () => {
     mock('@blackbaud/skyux-logger', logger);
 
     mock('git-clone', (url, path, cb) => {
+      gitCloneUrl = url;
       cb(customError);
     });
 
@@ -84,7 +87,7 @@ describe('skyux new command', () => {
     spyOn(fs, 'readJsonSync').and.returnValue({});
     spyOn(fs, 'writeJsonSync');
 
-    mock.reRequire('../lib/new')();
+    mock.reRequire('../lib/new')({});
     sendLine('some-spa-name', () => {
       sendLine('', () => {
         expect(prompt.calls.argsFor(0)).toContain(
@@ -218,7 +221,7 @@ describe('skyux new command', () => {
 
   it('should clone the default template if custom template not provided', (done) => {
     spyOnPrompt();
-    const skyuxNew = mock.reRequire('../lib/new')();
+    const skyuxNew = mock.reRequire('../lib/new')({});
     sendLine('some-spa-name', () => {
       sendLine('', () => {
         skyuxNew.then(() => {
@@ -230,7 +233,7 @@ describe('skyux new command', () => {
   });
 
   it('should catch a spa name with invalid characters', (done) => {
-    mock.reRequire('../lib/new')();
+    mock.reRequire('../lib/new')({});
     sendLine('This Is Invalid', () => {
       expect(spyWrite.calls.allArgs()).toContain(
         ['SPA root directories may only contain lower-case letters, numbers or dashes.\n']
@@ -241,17 +244,55 @@ describe('skyux new command', () => {
 
   it('should catch a spa directory that already exists', (done) => {
     spyOn(fs, 'existsSync').and.returnValue(true);
-    mock.reRequire('../lib/new')();
+    mock.reRequire('../lib/new')({});
     sendLine('some-spa-name', () => {
       expect(spyWrite.calls.allArgs()).toContain(['SPA directory already exists.\n']);
       done();
     });
   });
 
+  it('should use the --name argument and handle an error', () => {
+    const skyuxNew = mock.reRequire('../lib/new')({
+      name: 'This Is Invalid'
+    });
+
+    expect(logger.error).toHaveBeenCalledWith(
+      'SPA root directories may only contain lower-case letters, numbers or dashes.'
+    );
+  });
+
+  it('should use the --repo argument', (done) => {
+    const repo = 'my-custom-repo-url';
+    const skyuxNew = mock.reRequire('../lib/new')({
+      repo
+    });
+
+    sendLine('some-spa-name', () => {
+      skyuxNew.then(() => {
+        expect(gitCloneUrl).toBe(repo);
+        done();
+      });
+    });
+  });
+
+  it('should use the default template if --repo argument is false (--no-repo)', (done) => {
+    spyOnPrompt();
+    const skyuxNew = mock.reRequire('../lib/new')({
+      repo: false
+    });
+
+    sendLine('some-spa-name', () => {
+      skyuxNew.then(() => {
+        expect(spyOraSucceed).toHaveBeenCalledWith('default template successfully cloned.');
+        done();
+      });
+    });
+  });
+
   it('should handle an error cloning the default template', (done) => {
     customError = 'TEMPLATE_ERROR_1';
     spyOn(fs, 'existsSync').and.returnValue(false);
-    const skyuxNew = mock.reRequire('../lib/new')();
+    const skyuxNew = mock.reRequire('../lib/new')({});
     sendLine('some-spa-name', () => {
       sendLine('', () => {
         skyuxNew.then(() => {
@@ -265,7 +306,7 @@ describe('skyux new command', () => {
   it('should handle an error cloning the repo', (done) => {
     customError = 'CUSTOM-ERROR2';
     spyOn(fs, 'existsSync').and.returnValue(false);
-    const skyuxNew = mock.reRequire('../lib/new')();
+    const skyuxNew = mock.reRequire('../lib/new')({});
     sendLine('some-spa-name', () => {
       sendLine('some-spa-repo', () => {
         skyuxNew.then(() => {
@@ -284,7 +325,7 @@ describe('skyux new command', () => {
       '.gitignore',
       'repo-not-empty'
     ]);
-    const skyuxNew = mock.reRequire('../lib/new')();
+    const skyuxNew = mock.reRequire('../lib/new')({});
     sendLine('some-spa-name', () => {
       sendLine('some-spa-repo', () => {
         skyuxNew.then(() => {
@@ -309,7 +350,7 @@ describe('skyux new command', () => {
     spyOn(fs, 'removeSync');
     spyOn(fs, 'copySync');
 
-    const skyuxNew = mock.reRequire('../lib/new')();
+    const skyuxNew = mock.reRequire('../lib/new')({});
     let spawnCalledCount = 0;
 
     logger.logLevel = 'verbose';
@@ -351,7 +392,7 @@ describe('skyux new command', () => {
     spyOn(fs, 'copySync');
 
     logger.logLevel = 'verbose';
-    const skyuxNew = mock.reRequire('../lib/new')();
+    const skyuxNew = mock.reRequire('../lib/new')({});
 
     sendLine('some-spa-name', () => {
       sendLine('some-spa-name', () => {
@@ -391,7 +432,7 @@ describe('skyux new command', () => {
     spyOn(fs, 'removeSync');
     spyOn(fs, 'copySync');
 
-    const skyuxNew = mock.reRequire('../lib/new')();
+    const skyuxNew = mock.reRequire('../lib/new')({});
 
     sendLine('some-spa-name', () => {
 
@@ -421,7 +462,7 @@ describe('skyux new command', () => {
     ]);
     spyOn(fs, 'readJsonSync').and.returnValue({});
     spyOnPrompt();
-    const skyuxNew = mock.reRequire('../lib/new')();
+    const skyuxNew = mock.reRequire('../lib/new')({});
     sendLine('some-spa-name', () => {
       sendLine('some-spa-repo', () => {
         skyuxNew.then(() => {
@@ -447,7 +488,7 @@ describe('skyux new command', () => {
     spyOn(fs, 'removeSync');
     spyOn(fs, 'copySync');
 
-    mock.reRequire('../lib/new')();
+    mock.reRequire('../lib/new')({});
 
     // Don't provide current repo URL to clone
     sendLine('some-spa-name', () => {
