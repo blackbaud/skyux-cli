@@ -146,6 +146,17 @@ describe('skyux CLI', () => {
       expect(spyProcessExit).not.toHaveBeenCalled();
     });
 
+    it('should accept known command install', () => {
+      let called = false;
+      mock('../lib/install', () => {
+        called = true;
+      });
+
+      cli({ _: ['install'] });
+      expect(called).toEqual(true);
+      expect(spyProcessExit).not.toHaveBeenCalled();
+    });
+
     it('should accept unknown command', () => {
       cli({ _: ['unknownCommand'] });
       expect(logger.info).toHaveBeenCalledWith(`SKY UX processing command unknownCommand`);
