@@ -18,9 +18,6 @@
     "type": "git",
     "url": "git+https://github.com/blackbaud/skyux-cli.git"
   },
-  "engines": {
-    "node": ">= 6.11.1"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",

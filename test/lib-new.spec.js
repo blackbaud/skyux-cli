@@ -361,7 +361,6 @@ describe('skyux new command', () => {
 
           if (spawnCalledCount === 1) {
             skyuxNew.then(() => {
-              expect(logger.info).toHaveBeenCalledWith('Running npm install (can take several minutes)');
               expect(logger.info).toHaveBeenCalledWith(
                 'Change into that directory and run "skyux serve" to begin.'
               );
