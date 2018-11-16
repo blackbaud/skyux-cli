@@ -4,9 +4,6 @@
 const fs = require('fs-extra');
 const mock = require('mock-require');
 const EventEmitter = require('events').EventEmitter;
-const ora = require('ora');
-
-let emitter;
 
 const sendLine = (line, cb) => {
   setImmediate(() => {
@@ -16,39 +13,29 @@ const sendLine = (line, cb) => {
 };
 
 let customError = '';
+let emitter;
 let versionsRequested;
-let logger;
-let spyWrite;
-let spyOraFail;
-let spyOraSucceed;
 let gitCloneUrl;
+let spyLogger;
+let spyLoggerPromise;
 
 describe('skyux new command', () => {
 
   beforeEach(() => {
 
     gitCloneUrl = undefined;
-    spyOraFail = jasmine.createSpy('fail');
-    spyOraSucceed = jasmine.createSpy('succeed');
 
-    mock('ora', () => ({
-      start: () => ({
-        succeed: spyOraSucceed,
-        fail: spyOraFail
-      })
-    }));
+    spyLoggerPromise = jasmine.createSpyObj('getLoggerResponse', ['succeed', 'fail']);
+    spyLogger = jasmine.createSpyObj('logger', [
+      'info',
+      'warn',
+      'error',
+      'verbose',
+      'promise'
+    ]);
 
-    logger = jasmine.createSpyObj(
-      'logger',
-      [
-        'info',
-        'warn',
-        'error',
-        'verbose',
-        'bobby'
-      ]
-    );
-    mock('@blackbaud/skyux-logger', logger);
+    spyLogger.promise.and.returnValue(spyLoggerPromise);
+    mock('@blackbaud/skyux-logger', spyLogger);
 
     mock('git-clone', (url, path, cb) => {
       gitCloneUrl = url;
@@ -56,8 +43,8 @@ describe('skyux new command', () => {
     });
 
     emitter = new EventEmitter();
-    mock('cross-spawn', (cmd, args) => {
-      emitter.emit('spawnCalled', cmd, args);
+    mock('cross-spawn', (cmd, args, settings) => {
+      emitter.emit('spawnCalled', cmd, args, settings);
       return emitter;
     });
 
@@ -67,7 +54,8 @@ describe('skyux new command', () => {
       return Promise.resolve(`${dep}-LATEST`);
     });
 
-    spyWrite = spyOn(process.stdout, 'write');
+    // Keeps the logs clean from promptly
+    spyOn(process.stdout, 'write');
 
     customError = null;
   });
@@ -103,12 +91,10 @@ describe('skyux new command', () => {
 
   // Cloning the template is a perfect scenario to test the entire custom logger setup.
   // It has info, error messages, and success messages.
-  function cloneTest(isVerbose, cb) {
+  function cloneTest(cb) {
     spyOnPrompt();
-
-    if (isVerbose) {
-      logger.logLevel = 'verbose';
-    }
+    spyOn(fs, 'readJsonSync').and.returnValue({});
+    spyOn(fs, 'writeJsonSync');
 
     const customTemplateName = 'valid-template-name';
     const skyuxNew = mock.reRequire('../lib/new')({
@@ -122,49 +108,23 @@ describe('skyux new command', () => {
     });
   }
 
-  it('should use the template flag as a GitHub repo name if it does not contain a colon (regular)', (done) => {
-    const spyOraSucceed = jasmine.createSpy('succeed');
-    mock('ora', () => ({
-      start: () => ({
-        succeed: spyOraSucceed
-      })
-    }));
-
-    cloneTest(false, (customTemplateName) => {
-      expect(spyOraSucceed).toHaveBeenCalledWith(
+  it('should use the template flag as a GitHub repo name if it does not contain a colon', (done) => {
+    cloneTest((customTemplateName) => {
+      expect(spyLoggerPromise.succeed).toHaveBeenCalledWith(
         `${customTemplateName} template successfully cloned.`
       );
       done();
     });
   });
 
-  it('should use the template flag as a GitHub repo name if it does not contain a colon (verbose)', (done) => {
-    cloneTest(true, (customTemplateName) => {
-      expect(logger.info).toHaveBeenCalledWith(
-        `${customTemplateName} template successfully cloned.`
-      );
-      done();
-    });
-  });
-
-  it('should handle an error cloning a custom template (regular)', (done) => {
+  it('should handle an error cloning a custom template', (done) => {
     customError = 'TEMPLATE_ERROR_2';
     spyOn(fs, 'existsSync').and.returnValue(false);
 
-    cloneTest(false, () => {
-      expect(spyOraFail).toHaveBeenCalledWith(
+    cloneTest(() => {
+      expect(spyLoggerPromise.fail).toHaveBeenCalledWith(
         'Template not found at location, https://github.com/blackbaud/skyux-template-valid-template-name.'
       );
-      done();
-    });
-  });
-
-  it('should handle an error cloning a custom template (verbose)', (done) => {
-    customError = 'TEMPLATE_ERROR_2';
-    spyOn(fs, 'existsSync').and.returnValue(false);
-
-    cloneTest(true, () => {
-      expect(logger.error).toHaveBeenCalledWith(customError);
       done();
     });
   });
@@ -178,7 +138,7 @@ describe('skyux new command', () => {
     sendLine('some-spa-name', () => {
       sendLine('', () => {
         skyuxNew.then(() => {
-          expect(spyOraSucceed).toHaveBeenCalledWith(
+          expect(spyLoggerPromise.succeed).toHaveBeenCalledWith(
             `${customTemplateName} template successfully cloned.`
           );
           done();
@@ -195,7 +155,7 @@ describe('skyux new command', () => {
     sendLine('some-spa-name', () => {
       sendLine('', () => {
         skyuxNew.then(() => {
-          expect(logger.info).toHaveBeenCalledWith(
+          expect(spyLogger.info).toHaveBeenCalledWith(
             `Creating a new SPA named 'skyux-lib-some-spa-name'.`
           );
           done();
@@ -212,7 +172,7 @@ describe('skyux new command', () => {
     sendLine('some-spa-name', () => {
       sendLine('', () => {
         skyuxNew.then(() => {
-          expect(spyOraSucceed).toHaveBeenCalledWith('default template successfully cloned.');
+          expect(spyLoggerPromise.succeed).toHaveBeenCalledWith('default template successfully cloned.');
           done();
         });
       });
@@ -225,7 +185,7 @@ describe('skyux new command', () => {
     sendLine('some-spa-name', () => {
       sendLine('', () => {
         skyuxNew.then(() => {
-          expect(spyOraSucceed).toHaveBeenCalledWith('default template successfully cloned.');
+          expect(spyLoggerPromise.succeed).toHaveBeenCalledWith('default template successfully cloned.');
           done();
         });
       });
@@ -235,8 +195,8 @@ describe('skyux new command', () => {
   it('should catch a spa name with invalid characters', (done) => {
     mock.reRequire('../lib/new')({});
     sendLine('This Is Invalid', () => {
-      expect(spyWrite.calls.allArgs()).toContain(
-        ['SPA root directories may only contain lower-case letters, numbers or dashes.\n']
+      expect(spyLogger.error).toHaveBeenCalledWith(
+        'SPA root directories may only contain lower-case letters, numbers or dashes.'
       );
       done();
     });
@@ -246,7 +206,7 @@ describe('skyux new command', () => {
     spyOn(fs, 'existsSync').and.returnValue(true);
     mock.reRequire('../lib/new')({});
     sendLine('some-spa-name', () => {
-      expect(spyWrite.calls.allArgs()).toContain(['SPA directory already exists.\n']);
+      expect(spyLogger.error).toHaveBeenCalledWith('SPA directory already exists.');
       done();
     });
   });
@@ -256,7 +216,7 @@ describe('skyux new command', () => {
       name: 'This Is Invalid'
     });
 
-    expect(logger.error).toHaveBeenCalledWith(
+    expect(spyLogger.error).toHaveBeenCalledWith(
       'SPA root directories may only contain lower-case letters, numbers or dashes.'
     );
   });
@@ -283,7 +243,7 @@ describe('skyux new command', () => {
 
     sendLine('some-spa-name', () => {
       skyuxNew.then(() => {
-        expect(spyOraSucceed).toHaveBeenCalledWith('default template successfully cloned.');
+        expect(spyLoggerPromise.succeed).toHaveBeenCalledWith('default template successfully cloned.');
         done();
       });
     });
@@ -296,7 +256,7 @@ describe('skyux new command', () => {
     sendLine('some-spa-name', () => {
       sendLine('', () => {
         skyuxNew.then(() => {
-          expect(logger.error).toHaveBeenCalledWith('TEMPLATE_ERROR_1');
+          expect(spyLogger.error).toHaveBeenCalledWith('TEMPLATE_ERROR_1');
           done();
         });
       });
@@ -310,7 +270,7 @@ describe('skyux new command', () => {
     sendLine('some-spa-name', () => {
       sendLine('some-spa-repo', () => {
         skyuxNew.then(() => {
-          expect(logger.error).toHaveBeenCalledWith('CUSTOM-ERROR2');
+          expect(spyLogger.error).toHaveBeenCalledWith('CUSTOM-ERROR2');
           done();
         });
       });
@@ -329,7 +289,7 @@ describe('skyux new command', () => {
     sendLine('some-spa-name', () => {
       sendLine('some-spa-repo', () => {
         skyuxNew.then(() => {
-          expect(logger.error).toHaveBeenCalledWith(
+          expect(spyLogger.error).toHaveBeenCalledWith(
             'skyux new only works with empty repositories.'
           );
           done();
@@ -338,7 +298,7 @@ describe('skyux new command', () => {
     });
   });
 
-  it('should ignore .git and README.md files when cloning and run npm install (verbose)', (done) => {
+  it('should ignore .git and README.md files when cloning and run npm install', (done) => {
     spyOn(fs, 'existsSync').and.returnValue(false);
     spyOn(fs, 'readdirSync').and.returnValue([
       '.git',
@@ -353,15 +313,13 @@ describe('skyux new command', () => {
     const skyuxNew = mock.reRequire('../lib/new')({});
     let spawnCalledCount = 0;
 
-    logger.logLevel = 'verbose';
-
     sendLine('some-spa-name', () => {
       sendLine('some-spa-repo', () => {
         emitter.on('spawnCalled', () => {
 
           if (spawnCalledCount === 1) {
             skyuxNew.then(() => {
-              expect(logger.info).toHaveBeenCalledWith(
+              expect(spyLogger.info).toHaveBeenCalledWith(
                 'Change into that directory and run "skyux serve" to begin.'
               );
               done();
@@ -378,7 +336,7 @@ describe('skyux new command', () => {
     });
   });
 
-  it('should handle errors when running git checkout (verbose)', (done) => {
+  function spawnGitCheckout(stdio, done) {
     spyOn(fs, 'existsSync').and.returnValue(false);
     spyOn(fs, 'readdirSync').and.returnValue([
       '.git',
@@ -390,12 +348,11 @@ describe('skyux new command', () => {
     spyOn(fs, 'removeSync');
     spyOn(fs, 'copySync');
 
-    logger.logLevel = 'verbose';
     const skyuxNew = mock.reRequire('../lib/new')({});
 
     sendLine('some-spa-name', () => {
       sendLine('some-spa-name', () => {
-        emitter.on('spawnCalled', (command, args) => {
+        emitter.on('spawnCalled', (command, args, settings) => {
           skyuxNew.then(() => {
             expect(command).toEqual('git');
             expect(args).toEqual([
@@ -403,10 +360,9 @@ describe('skyux new command', () => {
               '-b',
               'initial-commit'
             ]);
-            expect(logger.info).toHaveBeenCalledWith('Switching to branch initial-commit.');
-            expect(logger.error).toHaveBeenCalledWith(
-              'Switching to branch initial-commit failed.'
-            );
+            expect(settings.stdio).toBe(stdio);
+            expect(spyLogger.promise).toHaveBeenCalledWith('Switching to branch initial-commit.');
+            expect(spyLoggerPromise.fail).toHaveBeenCalled();
             done();
           });
 
@@ -417,6 +373,15 @@ describe('skyux new command', () => {
         });
       });
     });
+  }
+
+  it('should handle errors when running git checkout', (done) => {
+    spawnGitCheckout('ignore', done);
+  });
+
+  it('shoul d pass stdio: inherit to spawn when logLevel is verbose', (done) => {
+    spyLogger.logLevel = 'verbose';
+    spawnGitCheckout('inherit', done);
   });
 
   it('should handle errors when running npm install', (done) => {
@@ -439,7 +404,7 @@ describe('skyux new command', () => {
       sendLine('', () => {
         emitter.on('spawnCalled', () => {
           skyuxNew.then(() => {
-            expect(logger.error).toHaveBeenCalledWith('npm install failed.');
+            expect(spyLogger.error).toHaveBeenCalledWith('npm install failed.');
             done();
           });
 
@@ -465,7 +430,7 @@ describe('skyux new command', () => {
     sendLine('some-spa-name', () => {
       sendLine('some-spa-repo', () => {
         skyuxNew.then(() => {
-          expect(logger.info).toHaveBeenCalledWith('Template cleanup failed.');
+          expect(spyLogger.info).toHaveBeenCalledWith('Template cleanup failed.');
           done();
         });
       });

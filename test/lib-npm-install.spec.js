@@ -8,7 +8,10 @@ describe('npm install library', () => {
 
 
   beforeEach(() => {
-    spyOn(logger, 'info');
+    spyOn(logger, 'promise').and.returnValue({
+      succeed: () => {},
+      fail: () => {}
+    });
   });
 
   function getArgsFromSpawn(settings) {
@@ -54,7 +57,7 @@ describe('npm install library', () => {
 
   it('should listen for the exit event and resolve if exit code is 0', (done) => {
     getPromiseFromSpawn(0).then(() => {
-      expect(logger.info).toHaveBeenCalledWith('Running npm install');
+      expect(logger.promise).toHaveBeenCalledWith('Running npm install (can take several minutes)');
       done();
     }, () => {});
   });
