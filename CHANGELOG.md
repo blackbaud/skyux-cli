@@ -1,3 +1,10 @@
+# 1.6.0 (2018-12-04)
+
+- Created the `skyux install` command for completely removing the `node_modules` folder and running `npm install`. [#160](https://github.com/blackbaud/skyux-cli/pull/160)
+- Changed default logging to concise, which can be overridden by `--logLevel verbose`. [#158](https://github.com/blackbaud/skyux-cli/pull/158) 
+- Introduced the `--name` and `--repo` flags for `skyux new`. [#158](https://github.com/blackbaud/skyux-cli/pull/158)
+- Added help information for `skyux generate` command. [#157](https://github.com/blackbaud/skyux-cli/pull/157) Thanks [@Blackbaud-DiHuynh](https://github.com/Blackbaud-DiHuynh)! 
+
 # 1.5.0 (2018-05-31)
 
 - New libraries are now created with a different dependency structure than SPAs. [#155](https://github.com/blackbaud/skyux-cli/pull/155)
