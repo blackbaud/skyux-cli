@@ -398,4 +398,24 @@ describe('skyux CLI', () => {
     expect(logger.verbose).toHaveBeenCalledWith(`Multiple instances found. Skipping passing command to duplicate-module-name`);
   });
 
+  it('should recognize packages in both `@blackbaud` and `@skyux-sdk` namespaces', () => {
+    const patternsCalled = [];
+    mock('path', {
+      join: (dir, pattern) => {
+        patternsCalled.push(pattern);
+      }
+    });
+
+    mock('glob', {
+      sync: () => []
+    });
+
+    mock('../lib/help', () => {});
+
+    cli({ _: [] });
+
+    expect(patternsCalled.includes('/skyux-builder*/package.json')).toEqual(true);
+    expect(patternsCalled.includes('@skyux-sdk/builder*/package.json')).toEqual(true);
+  });
+
 });
