@@ -14,7 +14,7 @@ function getGlobs() {
 
   // Look globally and locally for matching glob pattern
   const dirs = [
-    `${process.cwd()}/node_modules/*`, // local (where they ran the command from)
+    `${process.cwd()}/node_modules/`, // local (where they ran the command from)
     `${__dirname}/..`,  // global, if scoped package (where this code exists)
     `${__dirname}/../..`, // global, if not scoped package
   ];
@@ -22,7 +22,7 @@ function getGlobs() {
   let globs = [];
 
   dirs.forEach(dir => {
-    const legacyPattern = path.join(dir, '/skyux-builder*/package.json');
+    const legacyPattern = path.join(dir, '*/skyux-builder*/package.json');
     const newPattern = path.join(dir, '@skyux-sdk/builder*/package.json');
 
     logger.verbose(`Looking for modules in ${legacyPattern} and ${newPattern}`);

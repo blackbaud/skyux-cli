@@ -414,7 +414,7 @@ describe('skyux CLI', () => {
 
     cli({ _: [] });
 
-    expect(patternsCalled.includes('/skyux-builder*/package.json')).toEqual(true);
+    expect(patternsCalled.includes('*/skyux-builder*/package.json')).toEqual(true);
     expect(patternsCalled.includes('@skyux-sdk/builder*/package.json')).toEqual(true);
   });
 
