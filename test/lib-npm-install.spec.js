@@ -42,15 +42,12 @@ describe('npm install library', () => {
   }
 
   it('should not set cwd in path is not passed in the settings', () => {
-    expect(getArgsFromSpawn({})).toEqual({
-      stdio: 'inherit'
-    });
+    expect(getArgsFromSpawn({})).toEqual({});
   });
 
   it('should set cwd in path is not passed in the settings', () => {
     const myCustomPath = 'my-custom-path';
     expect(getArgsFromSpawn({ path: myCustomPath })).toEqual({
-      stdio: 'inherit',
       cwd: myCustomPath
     });
   });
