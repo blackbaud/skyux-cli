@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/blackbaud/skyux-cli#readme",
   "dependencies": {
-    "@blackbaud/skyux-logger": "1.1.0",
+    "@blackbaud/skyux-logger": "1.1.1",
     "cross-spawn": "5.1.0",
     "fs-extra": "4.0.1",
     "git-clone": "0.1.0",

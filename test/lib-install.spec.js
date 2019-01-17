@@ -20,6 +20,7 @@ let npmInstallSpy;
 describe('skyux install command', () => {
 
   let spyRemove;
+  let spyLoggerPromise;
 
   beforeEach(() => {
     spyRemove = spyOn(fs, 'remove').and.returnValue(Promise.resolve());
@@ -31,9 +32,12 @@ describe('skyux install command', () => {
         'warn',
         'error',
         'verbose',
-        'bobby'
+        'promise'
       ]
     );
+
+    spyLoggerPromise = jasmine.createSpyObj('promise', ['fail', 'succeed']);
+    logger.promise.and.returnValue(spyLoggerPromise);
 
     mock('@blackbaud/skyux-logger', logger);
 
@@ -53,13 +57,51 @@ describe('skyux install command', () => {
     mock.stopAll();
   });
 
-  it('should delete node_modules and run npm install', () => {
+  it('should delete node_modules and run npm install', (done) => {
     const install = mock.reRequire('../lib/install');
 
-    install();
+    install().then(() => {
+      expect(spyRemove).toHaveBeenCalled();
+      expect(npmInstallSpy).toHaveBeenCalledWith({
+        stdio: 'ignore'
+      });
 
-    expect(spyRemove).toHaveBeenCalled();
-    expect(npmInstallSpy).toHaveBeenCalled();
+      done();
+    });
+  });
+
+  it('should pass stdio: inherit to spawn when logLevel is verbose', (done) => {
+    logger.logLevel = 'verbose';
+    const install = mock.reRequire('../lib/install');
+
+    install().then(() => {
+      expect(npmInstallSpy).toHaveBeenCalledWith({
+        stdio: 'inherit'
+      });
+
+      done();
+    });
+
+  });
+
+  it('should handle successfully deleting node_modules', (done) => {
+    const install = mock.reRequire('../lib/install');
+    install().then(() => {
+      expect(spyLoggerPromise.succeed).toHaveBeenCalled();
+      done();
+    });
+  });
+
+  it('should handle unsuccessfully deleting node_modules', (done) => {
+    const err = 'custom-error';
+    const install = mock.reRequire('../lib/install');
+
+    spyRemove.and.returnValue(Promise.reject(err))
+    install().then(() => {
+      expect(spyLoggerPromise.fail).toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalledWith(err);
+      done();
+    });
   });
 
 });
