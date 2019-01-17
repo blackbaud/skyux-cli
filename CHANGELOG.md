@@ -1,3 +1,7 @@
+# 1.6.2 (2019-01-17)
+
+- Bugfix to correctly display logging information during `skyux install`. [#165](https://github.com/blackbaud/skyux-cli/pull/165)
+
 # 1.6.1 (2019-01-15)
 
 - Bugfix to correctly handle modules scoped to `@skyux-sdk`. [#163](https://github.com/blackbaud/skyux-cli/pull/163)
