@@ -1,3 +1,7 @@
+# This repo and its published NPM package `@blackbaud/skyux-cli` have been deprecated.  Please use the [`@skyux-sdk/cli` package](https://github.com/blackbaud/skyux-sdk-cli) instead.
+
+* * *
+
 # skyux-cli
 
 [![npm](https://img.shields.io/npm/v/@blackbaud/skyux-cli.svg)](https://www.npmjs.com/package/@blackbaud/skyux-cli)
