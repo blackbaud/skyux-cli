@@ -32,7 +32,7 @@
     "git-clone": "0.1.0",
     "glob": "7.1.2",
     "latest-version": "3.1.0",
-    "minimist": "1.2.0",
+    "minimist": "1.2.5",
     "promptly": "2.2.0",
     "update-notifier": "2.2.0"
   },
